@@ -83,12 +83,12 @@ class Signup extends REST_Controller
         // print_r($files); die;
 
         $allImagesEmptyErrors = [];
-        if (empty($_FILES['id_image']['name'])) {
-            $allImagesEmptyErrors[] = 'ID image required';
-            // print_r($_FILES);
-            // die();
-            // $this->form_validation->set_rules('id_image', 'ID Image', 'required');
-        }
+        // if (empty($_FILES['id_image']['name'])) {
+        //     $allImagesEmptyErrors[] = 'ID image required';
+        //     // print_r($_FILES);
+        //     // die();
+        //     // $this->form_validation->set_rules('id_image', 'ID Image', 'required');
+        // }
         if (empty($_FILES['user_id_image']['name'])) {
             $allImagesEmptyErrors[] = 'User ID image required';
             // $this->form_validation->set_rules('user_id_image', 'User and ID Image', 'required');
@@ -113,7 +113,7 @@ class Signup extends REST_Controller
 
         // We need extension of the first file
 
-        $extensionOneArray = explode('/', $_FILES['id_image']['type']);
+        $extensionOneArray = explode('/', $_FILES['user_id_image']['type']);
         //  print_r($extensionOneArray); die;
         $config['file_name'] = uniqid() . '.' . round(microtime(true) * 1000) . '.' . $extensionOneArray[1];
 
@@ -197,12 +197,12 @@ class Signup extends REST_Controller
 
                 $uploadedFiles = [];
                 $uploadErrors = [];
-                if (!$this->upload->do_upload('id_image')) {
+                if (!$this->upload->do_upload('user_id_image')) {
                     $uploadErrors[] = $this->upload->display_errors();
                 }
                 $uploadedFiles[] = $this->upload->data();
                 // We need a different file name
-                $extensionTwoeArray = explode('/', $_FILES['user_id_image']['type']);
+                $extensionTwoArray = explode('/', $_FILES['user_sign_image']['type']);
                 //  print_r($extensionTwoArray); die;
                 $config['file_name'] = uniqid() . '.' . round(microtime(true) * 1000) . '.' . $extensionTwoArray[1];
                 $config['file_name'] = uniqid() . '.' . round(microtime(true) * 1000);
@@ -214,16 +214,16 @@ class Signup extends REST_Controller
                 }
                 $uploadedFiles[] = $this->upload->data();
                 // We need a different file name
-                $extensionThreeArray = explode('/', $_FILES['user_sign_image']['type']);
-                //  print_r($extensionThreeArray); die;
-                $config['file_name'] = uniqid() . '.' . round(microtime(true) * 1000) . '.' . $extensionThreeArray[1];
+                // $extensionThreeArray = explode('/', $_FILES['user_sign_image']['type']);
+                // //  print_r($extensionThreeArray); die;
+                // $config['file_name'] = uniqid() . '.' . round(microtime(true) * 1000) . '.' . $extensionThreeArray[1];
 
-                $this->load->library('upload', $config);
+                // $this->load->library('upload', $config);
 
-                if (!$this->upload->do_upload('user_sign_image')) {
-                    $uploadErrors[] = $this->upload->display_errors();
-                }
-                $uploadedFiles[] = $this->upload->data();
+                // if (!$this->upload->do_upload('user_sign_image')) {
+                //     $uploadErrors[] = $this->upload->display_errors();
+                // }
+                // $uploadedFiles[] = $this->upload->data();
                 // print_r($uploadedFiles); die;
                 // print_r([$uploadedFiles, $this->upload->data(), $uploadErrors]); die;
 
@@ -257,9 +257,9 @@ class Signup extends REST_Controller
                     'country'       => $this->input->post('country'),
                     'id_type'      => $this->input->post('id_type'),
                     'id_num'      => $this->input->post('id_num'),
-                    'id_image'      => $uploadedFiles[0]['file_name'], //$this->input->post('id_image'),
-                    'user_id_image'      => $uploadedFiles[1]['file_name'], //->input->post('user_id_image'),
-                    'user_sign_image'      => $uploadedFiles[2]['file_name'], //$this->input->post('user_sign_image'),
+                    // 'id_image'      => $uploadedFiles[0]['file_name'], //$this->input->post('id_image'),
+                    'user_id_image'      => $uploadedFiles[0]['file_name'], //->input->post('user_id_image'),
+                    'user_sign_image'      => $uploadedFiles[1]['file_name'], //$this->input->post('user_sign_image'),
                 ];
                 $duplicatemail = $this->app_model->checkDuplictemail($data);
                 if ($duplicatemail->num_rows() > 0) {
