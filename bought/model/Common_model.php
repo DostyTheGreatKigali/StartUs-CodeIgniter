@@ -11,7 +11,7 @@ class common_model extends CI_Model
         //Load email library
         $this->load->library('email');
 
-        $email = $this->db->select('*')->from('email_sms_gateway')->where('es_id', 2)->get()->row();
+        $email = $this->db->select('*')->from('email_sms_gateway')->where('es_id', 3)->get()->row();
 
         //SMTP & mail configuration
         $config = array(

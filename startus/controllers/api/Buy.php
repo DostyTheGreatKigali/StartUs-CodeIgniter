@@ -69,7 +69,7 @@
             //Validation Check confirm then Redirect to Payment
             if ($this->form_validation->run()) {
                 if (!$this->input->valid_ip($this->input->ip_address())) {
-                    $this->response(validation_errors(), REST_Controller::HTTP_OK);
+                    return $this->response(validation_errors(), REST_Controller::HTTP_OK);
                     // $this->session->set_flashdata('exception', display("ip_address") . " Invalid");
                     // redirect("buy");
                 }

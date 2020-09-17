@@ -21,25 +21,12 @@ class Auth extends REST_Controller
         return "areYou4Real";
     }
 
-    private function validate_token($token = '')
-    {
-        if (!empty($token)) {
-            $tk = $token;
-        } else return false;
-    }
-
-
-
     public function login_post()
     {
         // $data['title']    = display('customer');
         #-------------------------------------#
         $this->form_validation->set_rules('email', 'email', 'required');
         $this->form_validation->set_rules('password', 'password', 'required|max_length[32]|md5|trim');
-        $this->form_validation->set_rules('token', 'token', 'required');
-
-        // Setting Initial state for Token
-        $update_token_session = false;
 
         #-------------------------------------#
         $data['user'] = (object)$userData = array(
@@ -50,19 +37,6 @@ class Auth extends REST_Controller
         #-------------------------------------#
         if ($this->form_validation->run()) {
             // Checking If User has Token
-            if (!empty($_POST['token'])) {
-                if ($this->getToken_get($_POST['token'])) {
-                    // $update_token_session = true;
-                } else {
-                    // $update_token_session = false;
-                    $this->response([
-                        'status' => false,
-                        'message' => 'invalid token'
-                    ]);
-
-                    return false;
-                }
-            }
 
             $user = $this->auth_model->checkUser($userData);
 
@@ -83,6 +57,12 @@ class Auth extends REST_Controller
                 return    $this->response(['Invalid credentials'], REST_Controller::HTTP_OK);
             }
         }
+    }
+
+    public function register_post()
+    {
+        return $this->response(['Registration'], REST_Controller::HTTP_OK);
+        // echo("Registration");
     }
 
     public function logout()

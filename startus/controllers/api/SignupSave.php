@@ -17,9 +17,9 @@ class Signup extends REST_Controller
     public function index_post()
     {
         // File configs
-        $config['upload_path']          = './upload/api/users';
-        $config['allowed_types']        = 'gif|jpg|png|jpeg';
-        $config['max_size']             = 500;
+        $config['upload_path'] = './upload/api/users';
+        $config['allowed_types'] = 'gif|jpg|png|jpeg';
+        $config['max_size'] = 500;
         // if ($this->session->userdata('isLogIn'))
         //     redirect(base_url());
         // print_r($_POST);
@@ -94,7 +94,7 @@ class Signup extends REST_Controller
             // $this->form_validation->set_rules('user_id_image', 'User and ID Image', 'required');
         }
         if (empty($_FILES['user_sign_image']['name'])) {
-            $allImagesEmptyErrors[] = 'User Signature image required';
+            $allImagesEmptyErrors[] = 'User Sign image required';
 
             // $this->form_validation->set_rules('user_sign_image', 'User and Signature', 'required');
         }
@@ -280,13 +280,13 @@ class Signup extends REST_Controller
                 if ($this->app_model->registerUser($data)) {
                     // print_r($_POST);
                     // die();
-                    $appSetting = $this->common_model->get_setting();
+                    // $appSetting = $this->common_model->get_setting();
 
-                    $data['title']      = $appSetting->title;
-                    $data['to']         = $this->input->post('email');
-                    $data['subject']    = 'Account Activation';
-                    $data['message']    = "<br><b>Your account was created successfully, Please click on the link below to activate your account. </b><br> <a target='_blank' href='" . base_url('home/activeAcc/') . strtolower($userid) . md5($userid) . "'>" . base_url('home/activeAcc/') . strtolower($userid) . md5($userid) . "</a>";
-                    $this->common_model->send_email($data);
+                    // $data['title']      = $appSetting->title;
+                    // $data['to']         = $this->input->post('email');
+                    // $data['subject']    = 'Account Activation';
+                    // $data['message']    = "<br><b>Your account was created successfully, Please click on the link below to activate your account. </b><br> <a target='_blank' href='" . base_url('home/activeAcc/') . strtolower($userid) . md5($userid) . "'>" . base_url('home/activeAcc/') . strtolower($userid) . md5($userid) . "</a>";
+                    // $this->common_model->send_email($data);
 
                     // $this->session->set_flashdata('message', display('account_create_active_link'));
                     // redirect("register#tab2");

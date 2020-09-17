@@ -32,32 +32,32 @@
             $this->load->vars($gData);
         }
 
-        public function index_get()
-        {
+        // public function index_get()
+        // {
 
-            $cat_id = $this->app_model->catidBySlug($this->uri->segment(1));
+        //     $cat_id = $this->app_model->catidBySlug($this->uri->segment(1));
 
-            //Language setting
-            // $data['lang'] = $this->langSet();
+        //     //Language setting
+        //     // $data['lang'] = $this->langSet();
 
-            $data['title'] = $this->uri->segment(1);
-            $data['article'] = $this->app_model->article($cat_id->cat_id);
-            $data['cat_info'] = $this->app_model->cat_info($this->uri->segment(1));
-            $data['package'] = $this->app_model->package();
+        //     $data['title'] = $this->uri->segment(1);
+        //     $data['article'] = $this->app_model->article($cat_id->cat_id);
+        //     $data['cat_info'] = $this->app_model->cat_info($this->uri->segment(1));
+        //     $data['package'] = $this->app_model->package();
 
-            $this->response($data, REST_Controller::HTTP_OK);
+        //     $this->response($data, REST_Controller::HTTP_OK);
 
-            // $this->load->view('website/header', $data);
-            // $this->load->view('website/lending', $data);
-            // $this->load->view('website/footer', $data);
-        }
+        //     // $this->load->view('website/header', $data);
+        //     // $this->load->view('website/lending', $data);
+        //     // $this->load->view('website/footer', $data);
+        // }
 
-        public function confirm_package($package_id = NULL)
+        public function confirm_get($package_id = NULL)
         {
             $data['title']   = display('package');
-            $data['my_info'] = $this->Profile_model->my_info();
+            // $data['my_info'] = $this->Profile_model->my_info();
             $data['package'] = $this->package_model->package_info_by_id($package_id);
-            $data['content'] = $this->load->view('customer/pages/package_confirmation', $data, true);
+            // $data['content'] = $this->load->view('customer/pages/package_confirmation', $data, true);
             // $this->load->view('customer/layout/main_wrapper', $data);
             $this->response($data, REST_Controller::HTTP_OK);
         }
