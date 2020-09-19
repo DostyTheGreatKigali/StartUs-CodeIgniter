@@ -1,189 +1,379 @@
-<?php
-defined('BASEPATH') or exit('No direct script access allowed');
+  <?php
+    defined('BASEPATH') or exit('No direct script access allowed');
 
-require APPPATH . 'libraries/REST_Controller.php';
+    require APPPATH . 'libraries/REST_Controller.php';
 
-class Package extends REST_Controller
-{
-
-    public function __construct()
+    class Package extends REST_Controller
     {
-        parent::__construct();
-        $this->load->model(array(
-            'api/package_model'
-        ));
 
-        if (!$this->session->userdata('isAdmin'))
-            redirect('logout');
+        public function __construct()
+        {
+            parent::__construct();
 
-        if (
-            !$this->session->userdata('isLogin')
-            && !$this->session->userdata('isAdmin')
-        )
-            redirect('admin');
-    }
+            $this->load->model(array(
 
-    public function index()
-    {
-        $data['title']  = display('package_list');
-        #-------------------------------#
-        #
-        #pagination starts
-        #
-        $config["base_url"] = base_url('backend/package/package/index');
-        $config["total_rows"] = $this->db->count_all('package');
-        $config["per_page"] = 25;
-        $config["uri_segment"] = 5;
-        $config["last_link"] = "Last";
-        $config["first_link"] = "First";
-        $config['next_link'] = 'Next';
-        $config['prev_link'] = 'Prev';
-        $config['full_tag_open'] = "<ul class='pagination col-xs pull-right'>";
-        $config['full_tag_close'] = "</ul>";
-        $config['num_tag_open'] = '<li>';
-        $config['num_tag_close'] = '</li>';
-        $config['cur_tag_open'] = "<li class='disabled'><li class='active'><a href='#'>";
-        $config['cur_tag_close'] = "<span class='sr-only'></span></a></li>";
-        $config['next_tag_open'] = "<li>";
-        $config['next_tag_close'] = "</li>";
-        $config['prev_tag_open'] = "<li>";
-        $config['prev_tagl_close'] = "</li>";
-        $config['first_tag_open'] = "<li>";
-        $config['first_tagl_close'] = "</li>";
-        $config['last_tag_open'] = "<li>";
-        $config['last_tagl_close'] = "</li>";
-        /* ends of bootstrap */
-        $this->pagination->initialize($config);
-        $page = ($this->uri->segment(5)) ? $this->uri->segment(5) : 0;
-        $data['package'] = $this->package_model->read($config["per_page"], $page);
-        $data["links"] = $this->pagination->create_links();
-        #
-        #pagination ends
-        #    
-        $data['content'] = $this->load->view("backend/package/list", $data, true);
-        $this->load->view("backend/layout/main_wrapper", $data);
-    }
+                'common_model',
+                'api/app_model',
+                'customer/auth_model',
+                'customer/package_model',
+                'customer/transections_model',
+                'customer/transfer_model',
+                'customer/Profile_model',
 
+            ));
 
-    public function package_check($package_name, $package_id)
-    {
-        $packageExists = $this->db->select('*')
-            ->where('package_name', $package_name)
-            ->where_not_in('package_id', $package_id)
-            ->get('package')
-            ->num_rows();
+            $this->load->library('payment');
 
-        if ($packageExists > 0) {
-            $this->form_validation->set_message('package_check', 'The {field} is already registered.');
-            return false;
-        } else {
-            return true;
+            $gData['category']    = $this->app_model->categoryList();
+            // $gData['social_link'] = $this->app_model->social_link();
+            // $gData['web_language'] = $this->app_model->webLanguage();
+            @$gData['service']     = $this->app_model->article($this->app_model->catidBySlug('service')->cat_id, 8);
+
+            $this->load->vars($gData);
         }
-    }
 
+        // public function index_get()
+        // {
 
-    public function form($package_id = null)
-    {
-        $data['title']  = display('add_package');
-        /*-----------------------------------*/
-        if (!empty($package_id)) {
-            $this->form_validation->set_rules('package_name', display("package_name"), "required|max_length[250]|callback_package_check[$package_id]");
-        } else {
-            $this->form_validation->set_rules('package_name', display('package_name'), 'required|is_unique[package.package_name]|max_length[250]');
+        //     $cat_id = $this->app_model->catidBySlug($this->uri->segment(1));
+
+        //     //Language setting
+        //     // $data['lang'] = $this->langSet();
+
+        //     $data['title'] = $this->uri->segment(1);
+        //     $data['article'] = $this->app_model->article($cat_id->cat_id);
+        //     $data['cat_info'] = $this->app_model->cat_info($this->uri->segment(1));
+        //     $data['package'] = $this->app_model->package();
+
+        //     $this->response($data, REST_Controller::HTTP_OK);
+
+        //     // $this->load->view('website/header', $data);
+        //     // $this->load->view('website/lending', $data);
+        //     // $this->load->view('website/footer', $data);
+        // }
+
+        public function index_get($package_id = NULL)
+        {
+            $data['title']   = display('package');
+            // $data['my_info'] = $this->Profile_model->my_info();
+            $data['package'] = $this->package_model->package_info_by_id($package_id);
+            // $data['content'] = $this->load->view('customer/pages/package_confirmation', $data, true);
+            // $this->load->view('customer/layout/main_wrapper', $data);
+            return $this->response($data, REST_Controller::HTTP_OK);
         }
-        #------------------------#
-        $this->form_validation->set_rules('package_details', display('package_details'), 'max_length[1000]');
-        $this->form_validation->set_rules('package_amount', display('package_amount'), 'required|max_length[11]');
-        $this->form_validation->set_rules('daily_roi', display('daily_roi'), 'required|max_length[11]');
-        $this->form_validation->set_rules('weekly_roi', display('weekly_roi'), 'required|max_length[11]');
-        $this->form_validation->set_rules('monthly_roi', display('monthly_roi'), 'required|max_length[11]');
-        $this->form_validation->set_rules('yearly_roi', display('yearly_roi'), 'required|max_length[11]');
-        $this->form_validation->set_rules('total_percent', display('total_percent'), 'required|max_length[11]');
-        $this->form_validation->set_rules('status', display('status'), 'required|max_length[1]');
-        $this->form_validation->set_rules('period', display('period'), 'required');
 
-        /*-----------------------------------*/
-        $data['package'] = (object)$userdata = array(
-            'package_id'      => $this->input->post('package_id'),
-            'package_name'    => $this->input->post('package_name'),
-            'period'            => $this->input->post('period'),
-            'package_deatils' => $this->input->post('package_deatils'),
-            'package_amount'  => $this->input->post('package_amount'),
-            'daily_roi'       => $this->input->post('daily_roi'),
-            'weekly_roi'       => $this->input->post('weekly_roi'),
-            'monthly_roi'       => $this->input->post('monthly_roi'),
-            'yearly_roi'       => $this->input->post('yearly_roi'),
-            'total_percent'   => $this->input->post('total_percent'),
-            'status'          => $this->input->post('status'),
-        );
+        /*
+|--------------------------------------------------------------
+|   BUY PACKAGE 
+|--------------------------------------------------------------
+*/
+        public function buy($package_id = NULL)
+        {
 
-        /*-----------------------------------*/
-        if ($this->form_validation->run()) {
+            // balance chcck
+            $blance = $this->check_balance($package_id);
 
-            if (empty($package_id)) {
-                if ($this->package_model->create($userdata)) {
-                    $this->session->set_flashdata('message', display('save_successfully'));
-                } else {
-                    $this->session->set_flashdata('exception', display('please_try_again'));
+            if ($blance != NULL) {
+
+                $user_id = $this->session->userdata('user_id');
+                if ($this->check_investment($user_id) == '') {
+                    $saveLevel = array(
+                        'user_id'           => $this->session->userdata('user_id'),
+                        'sponser_commission' => 0.0,
+                        'team_commission'   => 0.0,
+                        'level'             => 1,
+                        'last_update'       => date('Y-m-d h:i:s')
+                    );
+
+                    /*********************************
+                     *   Data Store Details Table
+                     **********************************/
+                    $this->db->insert('team_bonus_details', $saveLevel);
+                    $this->db->insert('team_bonus', $saveLevel);
                 }
-                redirect("backend/package/package/form/");
+
+                $buy_data = array(
+                    'user_id'       => $this->session->userdata('user_id'),
+                    'sponsor_id'    => $this->session->userdata('sponsor_id'),
+                    'package_id'    => $package_id,
+                    'amount'        => $blance->package_amount,
+                    'invest_date'   => date('Y-m-d'),
+                    'day'           => date('N'),
+                );
+
+                $result = $this->package_model->buy_package($buy_data);
+                // check investment by customent
+                $customent_investment = $this->db->select('*')->from('investment')->where('user_id', $this->session->userdata('user_id'))->get()->num_rows();
+
+
+                $sponsor_id = $this->session->userdata('sponsor_id');
+                // get sponsert information by id
+                $sponsers_info = $this->db->select('*')->from('user_registration')->where('user_id', $sponsor_id)->get()->row();
+                // check invesment by sponser
+                $investment = $this->db->select('*')->from('investment')->where('user_id', $sponsor_id)->get()->num_rows();
+
+
+                if ($this->session->userdata('sponsor_id') != NULL) {
+
+                    if ($investment > 0) {
+                        // get package informaion by package id
+                        $pack_info = $this->package_model->package_info_by_id($package_id);
+                        #--------------------------------
+                        #    commission data save
+                        $commission_amount = ($blance->package_amount / 100) * 6;
+                        $commission = array(
+
+                            'user_id'       => $this->session->userdata('sponsor_id'),
+                            'Purchaser_id'  => $this->session->userdata('user_id'),
+                            'earning_type'  => 'type1',
+                            'package_id'    => $pack_info->package_id,
+                            'amount'        => $commission_amount,
+                            'date'          => date('Y-m-d'),
+
+                        );
+
+                        $this->db->insert('earnings', $commission);
+                        #   end commission
+                        #---------------------------------
+
+                        //get total balance
+                        $balance = $this->common_model->get_all_transection_by_user($sponsers_info->user_id);
+                        $new_balance = ($balance['balance'] + $commission_amount);
+                        #----------------------------
+                        # sms send to commission received
+                        #----------------------------
+
+                        $this->load->library('sms_lib');
+                        $template = array(
+                            'name'      => $sponsers_info->f_name . ' ' . $sponsers_info->l_name,
+                            'amount'    => $commission_amount,
+                            'new_balance' => $new_balance,
+                            'date'      => date('d F Y')
+                        );
+
+                        $send_sms = $this->sms_lib->send(array(
+
+                            'to'              => $sponsers_info->phone,
+                            'template'        => 'You received a referral commission of $%amount% . Your new balance is $%new_balance%',
+                            'template_config' => $template,
+
+                        ));
+
+                        #----------------------------------
+                        #   sms insert to received commission
+                        #---------------------------------
+                        if ($send_sms) {
+                            $message_data = array(
+                                'sender_id' => 1,
+                                'receiver_id' => $sponsers_info->user_id,
+                                'subject' => 'Commission',
+                                'message' => 'You received a referral commission of $' . $commission_amount . '. Your new balance is $' . $new_balance,
+                                'datetime' => date('Y-m-d h:i:s'),
+                            );
+
+                            $this->db->insert('message', $message_data);
+                        }
+                        #-------------------------------------     
+
+
+                        #---------------------------------
+                        #   Won Sponser set personal and team commission set heare
+
+                        $sponsers = $this->db->select('*')
+                            ->from('team_bonus')
+                            ->where('user_id', $sponsor_id)
+                            ->get()
+                            ->row();
+
+                        if ($sponsers != NULL) {
+
+                            $scom = @$sponsers->sponser_commission + $blance->package_amount;
+                            $tcom = @$sponsers->team_commission + $blance->package_amount;
+                            $sdata = array(
+                                'sponser_commission' => $scom,
+                                'team_commission' => $tcom,
+                                'last_update' => date('Y-m-d h:i:s')
+                            );
+                            $detailsdata = array(
+                                'user_id' => $sponsor_id,
+                                'sponser_commission' => $scom,
+                                'team_commission' => $tcom,
+                                'last_update' => date('Y-m-d h:i:s')
+                            );
+
+                            /******************************
+                             *   Data Store Details Table
+                             ******************************/
+                            $this->db->insert('team_bonus_details', $detailsdata);
+
+
+                            $this->db->where('user_id', $sponsor_id)->update('team_bonus', $sdata);
+                        } else {
+
+                            $scom = @$sponsers->sponser_commission + @$blance->package_amount;
+                            $tcom = @$sponsers->team_commission + @$blance->package_amount;
+
+                            $sdata = array(
+                                'user_id' => $sponsor_id,
+                                'sponser_commission' => $scom,
+                                'team_commission' => $tcom,
+                                'last_update' => date('Y-m-d h:i:s')
+                            );
+
+                            /******************************
+                             *   Data Store Details Table
+                             ******************************/
+                            $this->db->insert('team_bonus_details', $sdata);
+                            $this->db->insert('team_bonus', $sdata);
+                        }
+
+                        # END 
+                        #---------------------------------
+
+                        #-----------------------------
+                        # Level bonus heare with level
+                        $getBool = $this->setlevel_withbonus($sponsor_id);
+                        #-----------------------------
+
+                        #-----------------------------------
+                        # Leveling heare without level bonus
+                        // if($getBool!=TRUE){
+                        //     $this->setUserLevel($sponsor_id);
+                        // }
+                        #
+                        #-----------------------------------
+
+                        #---------------------------------
+                        #    sponser leveling check and set commission
+                        $lc = $this->db->select('user_id,level')
+                            ->from('team_bonus')
+                            ->where('user_id', $sponsor_id)
+                            ->where('level >=', 2)
+                            ->get()
+                            ->row();
+
+                        if (@$lc != NULL) {
+
+                            $referral_bonous = $this->db->select('*')
+                                ->from('setup_commission')
+                                ->where('level_name', 1)
+                                ->get()
+                                ->row();
+
+                            $commission_amount = ($pack_info->package_amount / 100) * $referral_bonous->referral_bonous;
+
+                            $commission = array(
+                                'user_id'       => $sponsor_id,
+                                'Purchaser_id'  => $this->session->userdata('user_id'),
+                                'earning_type'  => 'type1',
+                                'package_id'    => $package_id,
+                                'amount'        => $commission_amount,
+                                'date'          => date('Y-m-d'),
+                            );
+
+                            $this->db->insert('earnings', $commission);
+                        }
+                    }
+                    #
+                    #-----------------------------------
+
+                    #--------------------------------
+                    #
+                    $tuSdata = array(
+
+                        'genaretion'    => 2,
+                        'package_id'    => $package_id,
+                        'amount'        => $blance->package_amount,
+                        'sponsor_id'    => $sponsor_id
+                    );
+
+                    $this->recursive_data($tuSdata);
+                    #
+                    #--------------------------------
+
+                }
+
+                if ($result != NULL) {
+                    $transections_data = array(
+                        'user_id'                   => $this->session->userdata('user_id'),
+                        'transection_category'      => 'investment',
+                        'releted_id'                => $result['investment_id'],
+                        'amount'                    => $blance->package_amount,
+                        'transection_date_timestamp' => date('Y-m-d h:i:s')
+                    );
+
+                    $this->transections_model->save_transections($transections_data);
+
+                    #----------------------------
+                    # sms send to commission received
+                    #----------------------------
+
+                    $this->load->library('sms_lib');
+
+                    $template = array(
+                        'name'      => $this->session->userdata('fullname'),
+                        'amount'    => $blance->package_amount,
+                        'date'      => date('d F Y')
+                    );
+
+                    $send_sms = $this->sms_lib->send(array(
+                        'to'              => $this->session->userdata('phone'),
+                        'template'        => 'You bought a $%amount% package successfully',
+                        'template_config' => $template,
+                    ));
+
+                    #----------------------------------
+                    #   sms insert to received commission
+                    #---------------------------------
+                    if ($send_sms) {
+
+                        $message_data = array(
+                            'sender_id' => 1,
+                            'receiver_id' => $this->session->userdata('user_id'),
+                            'subject' => 'Package Buy',
+                            'message' => 'You bought a ' . $blance->package_amount . ' package successfully',
+                            'datetime' => date('Y-m-d h:i:s'),
+                        );
+
+                        $this->db->insert('message', $message_data);
+                    }
+                    #------------------------------------- 
+
+                    $set = $this->common_model->email_sms('email');
+                    $appSetting = $this->common_model->get_setting();
+                    #----------------------------
+                    #      email verify smtp
+                    #----------------------------
+                    $post = array(
+                        'title'           => $appSetting->title,
+                        'subject'           => 'Package Buy',
+                        'to'                => $this->session->userdata('email'),
+                        'message'           => 'You bought a ' . $blance->package_amount . ' package successfully',
+                    );
+                    $send_email = $this->common_model->send_email($post);
+
+                    if ($send_email) {
+                        $n = array(
+                            'user_id'                => $this->session->userdata('user_id'),
+                            'subject'                => 'Package Buy',
+                            'notification_type'      => 'package_by',
+                            'details'                => 'You bought a ' . $blance->package_amount . ' package successfully',
+                            'date'                   => date('Y-m-d h:i:s'),
+                            'status'                 => '0'
+                        );
+                        $this->db->insert('notifications', $n);
+                    }
+                }
+
+                $this->session->set_flashdata('message', display('package_buy_successfully'));
+                redirect('customer/package/buy_success/' . $package_id . '/' . $result['investment_id']);
             } else {
-                if ($this->package_model->update($userdata)) {
-                    $this->session->set_flashdata('message', display('update_successfully'));
-                } else {
-                    $this->session->set_flashdata('exception', display('please_try_again'));
-                }
-                redirect("backend/package/package/form/$package_id");
-            }
-        } else {
-            if (!empty($package_id)) {
-                $data['title'] = display('edit_package');
-                $data['package']   = $this->package_model->single($package_id);
-            }
-            $data['content'] = $this->load->view("backend/package/form", $data, true);
-            $this->load->view("backend/layout/main_wrapper", $data);
-        }
+
+                $this->session->set_flashdata('exception', display('balance_is_unavailable'));
+                redirect('customer/package/confirm_package/' . $package_id);
+            } // END FCHECK BALANCE
+
+        } // END FUNCTION
+
+
     }
-
-
-    public function delete($user_id = null)
-    {
-        if ($this->package_model->delete($user_id)) {
-            $this->session->set_flashdata('message', display('delete_successfully'));
-        } else {
-            $this->session->set_flashdata('exception', display('please_try_again'));
-        }
-        redirect("backend/package/package/");
-    }
-
-    /*
-    |----------------------------------------------
-    |        id genaretor
-    |----------------------------------------------     
-    */
-    public function randomID($mode = 2, $len = 6)
-    {
-        $result = "";
-        if ($mode == 1) :
-            $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        elseif ($mode == 2) :
-            $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        elseif ($mode == 3) :
-            $chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-        elseif ($mode == 4) :
-            $chars = "0123456789";
-        endif;
-
-        $charArray = str_split($chars);
-        for ($i = 0; $i < $len; $i++) {
-            $randItem = array_rand($charArray);
-            $result .= "" . $charArray[$randItem];
-        }
-        return $result;
-    }
-    /*
-    |----------------------------------------------
-    |         Ends of id genaretor
-    |----------------------------------------------
-    */
-}
