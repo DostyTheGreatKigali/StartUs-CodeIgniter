@@ -41,7 +41,7 @@ class Buy extends REST_Controller
         $data['currency']                 = $this->buy_model->findExcCurrency();
         $data['selectedlocalcurrency']     = $this->buy_model->findlocalCurrency();
         #------------------------#
-        return $this->response($data, REST_Controller::HTTP_OK);
+        return $this->response(['purchaseInfo' => $data, 'success' => TRUE, 'message' => 'Successfully retrieved buy Info'], REST_Controller::HTTP_OK);
     }
 
     public function index()
