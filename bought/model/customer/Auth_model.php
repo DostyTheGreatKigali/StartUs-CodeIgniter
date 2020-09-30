@@ -1,11 +1,24 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php defined('BASEPATH') or exit('No direct script access allowed');
 
-class Auth_model extends CI_Model {
+class Auth_model extends CI_Model
+{
 
 
 	public function checkUser($data = array())
 	{
-	   $where = "(email ='".$data['email']."' OR username = '".$data['email']."')";
+		$where = "(email ='" . $data['email'] . "' OR username = '" . $data['email'] . "')";
+
+		return $this->db->select("*")
+			->from('user_registration')
+			->where('password', md5($data['password']))
+			->where('status', 1)
+			->where($where)
+			->get();
+	}
+
+	public function checkUserPhone($data = array())
+	{
+		$where = "(phone ='" . $data['phone'] . "')";
 
 		return $this->db->select("*")
 			->from('user_registration')
@@ -19,7 +32,7 @@ class Auth_model extends CI_Model {
 	{
 		return $this->db->set('last_login', date('Y-m-d H:i:s'))
 			->set('ip_address', $this->input->ip_address())
-			->where('id',$this->session->userdata('id'))
+			->where('id', $this->session->userdata('id'))
 			->update('admin');
 	}
 
@@ -29,6 +42,4 @@ class Auth_model extends CI_Model {
 			->where('id', $this->session->userdata('id'))
 			->update('admin');
 	}
-
 }
- 

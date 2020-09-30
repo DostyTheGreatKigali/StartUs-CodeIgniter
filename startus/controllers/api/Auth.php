@@ -72,6 +72,56 @@ class Auth extends REST_Controller
         }
     }
 
+
+    public function loginPhone_post()
+    {
+        if ($this->input->post('token') != hash('sha256', $this->input->post('device_id'))) {
+            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
+        }
+        // $data['title']    = display('customer');
+        #-------------------------------------#
+        $this->form_validation->set_rules('phone', 'phone', 'required');
+        $this->form_validation->set_rules('password', 'password', 'required|max_length[32]|md5|trim');
+
+        #-------------------------------------#
+        $data['user'] = (object)$userData = array(
+            'phone'      => $this->input->post('phone'),
+            'password'   => $this->input->post('password'),
+        );
+
+        #-------------------------------------#
+        if ($this->form_validation->run()) {
+            // Checking If User has Token
+
+            $user = $this->auth_model->checkUser($userData);
+
+
+            if ($user->num_rows() > 0) {
+
+                // Create a new api_token for this user
+                $api_token = hash('sha256', $this->input->post('device_id') . '-' . time() . '-' . $user->row()->uid);
+                $this->db->set('api_token', $api_token);
+                $this->db->where('uid', $user->row()->uid);
+                $this->db->update('user_registration');
+
+                $sData = array(
+                    'isLogIn'       => true,
+                    'id'           => $user->row()->uid,
+                    'user_id'       => $user->row()->user_id,
+                    'sponsor_id'  => $user->row()->sponsor_id,
+                    'fullname'      => $user->row()->f_name . ' ' . $user->row()->l_name,
+                    'email'       => $user->row()->email,
+                    'phone'       => $user->row()->phone,
+                    'api_token'       => $api_token, //$user->row()->api_token,
+                );
+
+                return $this->response(['success' => TRUE, 'message' => 'Successfully logged in with phone', 'user' => $sData], REST_Controller::HTTP_OK);
+            } else {
+                return    $this->response(['success' => FALSE, 'message' => 'Invalid credentials with phone'], REST_Controller::HTTP_OK);
+            }
+        }
+    }
+
     public function register_post()
     {
         return $this->response(['Registration'], REST_Controller::HTTP_OK);
