@@ -16,13 +16,18 @@ class Auth extends REST_Controller
         ));
     }
 
-    private function getToken_get()
+    public function getToken_get()
     {
-        return "areYou4Real";
+        // return "areYou4Real";
+        // We need a device id for the user to give them token they will use to access public endpoints
+        return $this->response(['token' => hash('sha256', $_REQUEST['device_id'])], REST_Controller::HTTP_OK);
     }
 
     public function login_post()
     {
+        if ($this->input->post('token') != hash('sha256', $this->input->post('device_id'))) {
+            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
+        }
         // $data['title']    = display('customer');
         #-------------------------------------#
         $this->form_validation->set_rules('email', 'email', 'required');
@@ -40,21 +45,29 @@ class Auth extends REST_Controller
 
             $user = $this->auth_model->checkUser($userData);
 
+
             if ($user->num_rows() > 0) {
 
-                // $sData = array(
-                // 	'isLogIn' 	  => true,
-                // 	'id' 		  => $user->row()->uid,
-                // 	'user_id' 	  => $user->row()->user_id,
-                // 	'sponsor_id'  => $user->row()->sponsor_id,
-                // 	'fullname'	  => $user->row()->f_name.' '.$user->row()->l_name,
-                // 	'email' 	  => $user->row()->email,
-                // 	'phone' 	  => $user->row()->phone,
-                // );	
+                // Create a new api_token for this user
+                $api_token = hash('sha256', $this->input->post('device_id') . '-' . time() . '-' . $user->row()->uid);
+                $this->db->set('api_token', $api_token);
+                $this->db->where('uid', $user->row()->uid);
+                $this->db->update('user_registration');
 
-                return $this->response(['Successfully logged in'], REST_Controller::HTTP_OK);
+                $sData = array(
+                    'isLogIn'       => true,
+                    'id'           => $user->row()->uid,
+                    'user_id'       => $user->row()->user_id,
+                    'sponsor_id'  => $user->row()->sponsor_id,
+                    'fullname'      => $user->row()->f_name . ' ' . $user->row()->l_name,
+                    'email'       => $user->row()->email,
+                    'phone'       => $user->row()->phone,
+                    'api_token'       => $api_token, //$user->row()->api_token,
+                );
+
+                return $this->response(['success' => TRUE, 'message' => 'Successfully logged in', 'user' => $sData], REST_Controller::HTTP_OK);
             } else {
-                return    $this->response(['Invalid credentials'], REST_Controller::HTTP_OK);
+                return    $this->response(['success' => FALSE, 'message' => 'Invalid credentials'], REST_Controller::HTTP_OK);
             }
         }
     }

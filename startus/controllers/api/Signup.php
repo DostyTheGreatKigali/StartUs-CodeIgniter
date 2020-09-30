@@ -16,14 +16,20 @@ class Signup extends REST_Controller
 
     public function index_post()
     {
+        if ($this->input->post('token') != hash('sha256', $this->input->post('device_id'))) {
+            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
+        }
+
         // File configs
         $config['upload_path']          = './upload/api/users';
         $config['allowed_types']        = 'gif|jpg|png|jpeg';
         $config['max_size']             = 500;
         // if ($this->session->userdata('isLogIn'))
         //     redirect(base_url());
-        // print_r($_POST);
-        // die();
+        //  return $this->response($_FILES, REST_Controller::HTTP_OK);
+
+        //     print_r($_POST);
+        //     die();
         // return $this->response(['Testing'], REST_Controller::HTTP_OK);
         // $cat_id = $this->user->catidBySlug($this->uri->segment(1));
 
@@ -290,14 +296,14 @@ class Signup extends REST_Controller
 
                     // $this->session->set_flashdata('message', display('account_create_active_link'));
                     // redirect("register#tab2");
-                    return $this->response(['Successfully registered'], REST_Controller::HTTP_OK);
+                    return $this->response(['message' => 'Successfully registered', 'success' => TRUE], REST_Controller::HTTP_OK);
                 } else {
                     //         print("couldn not register");
                     //               print_r($_POST);
                     // die();
                     // $this->session->set_flashdata('exception',  display('please_try_again'));
                     // redirect("register");
-                    return $this->response(['Regitration Failed. Please try again'], REST_Controller::HTTP_OK);
+                    return $this->response(['message' => 'Regitration Failed. Please try again', 'success' => FALSE], REST_Controller::HTTP_OK);
                 }
             }
         }

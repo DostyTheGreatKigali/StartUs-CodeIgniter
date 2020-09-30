@@ -45,7 +45,7 @@
             $data['cat_info'] = $this->app_model->cat_info($this->uri->segment(1));
             $data['package'] = $this->app_model->package();
 
-            $this->response($data, REST_Controller::HTTP_OK);
+            $this->response(['packages' => $data, 'success' => TRUE, 'message' => 'Packages successfully loaded'], REST_Controller::HTTP_OK);
 
             // $this->load->view('website/header', $data);
             // $this->load->view('website/lending', $data);
