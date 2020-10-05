@@ -36,7 +36,7 @@ class Sell extends REST_Controller
         $data['currency'] = $this->sell_model->findExcCurrency();
         $data['selectedlocalcurrency'] = $this->sell_model->findlocalCurrency();
         #------------------------#
-        return $this->response($data, REST_Controller::HTTP_OK);
+        return $this->response(['success' => TRUE, 'purchaseInfo' => $data], REST_Controller::HTTP_OK);
     }
 
     public function index()
@@ -102,13 +102,25 @@ class Sell extends REST_Controller
         // $data['currency'] = $this->sell_model->findExcCurrency();
         // $data['selectedlocalcurrency'] = $this->sell_model->findlocalCurrency();
         #------------------------#
+
+        // Calculate like buypayable will at public function sellPayable_post()
+        $selected_data['selectedcryptocurrency'] = $this->sell_model->findCurrency($this->input->post('cid'));
+        $selected_data['selectedexccurrency'] = $this->sell_model->findExchangeCurrency($this->input->post('cid'));
+        $selected_data['selectedlocalcurrency'] = $this->sell_model->findlocalCurrency();
+
+        $selected_data['price_usd']         = $this->getPercentOfNumber($selected_data['selectedcryptocurrency']->price_usd, $selected_data['selectedexccurrency']->sell_adjustment) + $selected_data['selectedcryptocurrency']->price_usd;
+        $payableusd             = $selected_data['price_usd'] * $this->input->post('sell_amount');
+        $selected_data['payableusd']     = $payableusd;
+        $selected_data['payablelocal']     = $payableusd * $selected_data['selectedlocalcurrency']->usd_exchange_rate;
+        // End of  calculation like public function sellPayable_post()
+
         $this->form_validation->set_rules('cid', display('coin_name'), 'required');
         $this->form_validation->set_rules('sell_amount', display('sell_amount'), 'required');
         $this->form_validation->set_rules('wallet_id', display('wallet_data'), 'required');
         $this->form_validation->set_rules('payment_method', display('payment_method'), 'required');
-        $this->form_validation->set_rules('usd_amount', display('usd_amount'), 'required');
-        $this->form_validation->set_rules('rate_coin', display('rate_coin'), 'required');
-        $this->form_validation->set_rules('local_amount', display('local_amount'), 'required');
+        // $this->form_validation->set_rules('usd_amount', display('usd_amount'),'required');
+        // $this->form_validation->set_rules('rate_coin', display('rate_coin'),'required');
+        // $this->form_validation->set_rules('local_amount', display('local_amount'),'required');
 
         if ($this->input->post('payment_method') == 'bitcoin' || $this->input->post('payment_method') == 'payeer') {
             $this->form_validation->set_rules('comments', display('comments'), 'required');
@@ -150,13 +162,13 @@ class Sell extends REST_Controller
             'coin_wallet_id'          => $this->input->post('wallet_id'),
             'transection_type'      => "sell",
             'coin_amount'              => $this->input->post('sell_amount'),
-            'usd_amount'              => $this->input->post('usd_amount'),
-            'local_amount'          => $this->input->post('local_amount'),
+            'usd_amount'              => $selected_data['payableusd'], //$this->input->post('usd_amount'),
+            'local_amount'          => $selected_data['payablelocal'], //$this->input->post('local_amount'),
             'payment_method'          => $this->input->post('payment_method'),
             'request_ip'              => $this->input->ip_address(),
             'verification_code'     => "",
             'payment_details'          => $this->input->post('comments'),
-            'rate_coin'              => $this->input->post('rate_coin'),
+            'rate_coin'              => $selected_data['price_usd'], //$this->input->post('rate_coin'),
             'document_status'          => (!empty($image) ? 1 : 0),
             'om_name'                => $this->input->post('om_name'),
             'om_mobile'                => $this->input->post('om_mobile'),
@@ -241,7 +253,7 @@ class Sell extends REST_Controller
                 $data['price_usd']      = $this->getPercentOfNumber($data['selectedcryptocurrency']->price_usd, $data['selectedexccurrency']->sell_adjustment) + $data['selectedcryptocurrency']->price_usd;
             }
         }
-        return $this->response($data, REST_Controller::HTTP_OK);
+        return $this->response(['success' => TRUE, 'purchaseInfo' => $data], REST_Controller::HTTP_OK);
 
         // $this->load->view("customer/sell/ajaxpayable", $data);
     }
