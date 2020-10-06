@@ -62,7 +62,9 @@ class Auth extends REST_Controller
                     'fullname'      => $user->row()->f_name . ' ' . $user->row()->l_name,
                     'email'       => $user->row()->email,
                     'phone'       => $user->row()->phone,
-                    'api_token'       => $api_token, //$user->row()->api_token,
+                    'username'       => $user->row()->username,
+                    'api_token'       => $api_token,
+                    //$user->row()->api_token,
                 );
 
                 return $this->response(['success' => TRUE, 'message' => 'Successfully logged in', 'user' => $sData], REST_Controller::HTTP_OK);
@@ -112,6 +114,7 @@ class Auth extends REST_Controller
                     'fullname'      => $user->row()->f_name . ' ' . $user->row()->l_name,
                     'email'       => $user->row()->email,
                     'phone'       => $user->row()->phone,
+                    'username'       => $user->row()->username,
                     'api_token'       => $api_token, //$user->row()->api_token,
                 );
 
