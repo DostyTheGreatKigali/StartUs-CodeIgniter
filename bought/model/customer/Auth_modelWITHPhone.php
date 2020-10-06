@@ -16,6 +16,18 @@ class Auth_model extends CI_Model
 			->get();
 	}
 
+	public function checkUserPhone($data = array())
+	{
+		$where = "(phone ='" . $data['phone'] . "')";
+
+		return $this->db->select("*")
+			->from('user_registration')
+			->where('password', md5($data['password']))
+			->where('status', 1)
+			->where($where)
+			->get();
+	}
+
 	public function last_login($id = null)
 	{
 		return $this->db->set('last_login', date('Y-m-d H:i:s'))
