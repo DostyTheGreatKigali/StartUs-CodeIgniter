@@ -66,7 +66,7 @@ class Auth extends REST_Controller
                     'address'       => $user->row()->res_address,
                     'city_town'       => $user->row()->city_town,
                     'country'       => $user->row()->country,
-                    'api_token'       => $api_token,
+                    'api_token'       => $api_token
                     //$user->row()->api_token,
                 );
 
