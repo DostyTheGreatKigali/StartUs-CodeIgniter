@@ -106,4 +106,34 @@ class Deposit extends REST_Controller
         $data['content'] = $this->load->view('customer/pages/diposit', $data, true);
         $this->load->view('customer/layout/main_wrapper', $data);
     }
+
+    /*
+    |-----------------------------------
+    |   Fees for deposit Check
+    |-----------------------------------
+    */
+
+    public function fees_post()
+    {
+        $fees = $this->fees_load($this->input->post('amount'), $this->input->post('method'), 'deposit');
+        return $this->response(['success' => TRUE, 'fees' => $fees], REST_Controller::HTTP_OK);
+    }
+
+
+
+    /*
+    |---------------------------------
+    |   Fees Load and deposit amount 
+    |---------------------------------
+    */
+    public function fees_load($amount = null, $method = null, $level)
+    {
+
+        $result = $this->db->select('*')
+            ->from('fees_tbl')
+            ->where('level', $level)
+            ->get()
+            ->row();
+        return $fees = ($amount / 100) * $result->fees;
+    }
 }
