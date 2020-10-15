@@ -49,40 +49,42 @@ class Signup extends REST_Controller
         // return $this->response(['Testing'], REST_Controller::HTTP_OK);
 
         //Set Rules From validation
-        $this->form_validation->set_rules('f_name', display('firstname'), 'required|max_length[50]');
+        $this->form_validation->set_rules('f_name', 'Firstname', 'required|max_length[50]');
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('l_name', display('lastname'), 'required|max_length[50]');
+        $this->form_validation->set_rules('l_name', 'Lastname', 'required|max_length[50]');
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('username', display('username'), 'required|max_length[50]');
+        $this->form_validation->set_rules('username', 'Username', 'required|max_length[50]');
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('email', display('email'), "required|valid_email|max_length[100]");
+        $this->form_validation->set_rules('email', 'Email', "required|valid_email|max_length[100]");
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('pass', display('password'), 'required|min_length[8]|max_length[32]|matches[r_pass]');
+        $this->form_validation->set_rules('pass', 'Password', 'required|min_length[8]|max_length[32]|matches[r_pass]');
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('r_pass', display('password'), 'trim');
+        $this->form_validation->set_rules('r_pass', 'Password', 'trim');
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('phone', display('mobile'), 'max_length[100]');
+        $this->form_validation->set_rules('phone',  'Mobile', 'max_length[100]');
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('res_address', display('res_address'), 'trim|required');
+        $this->form_validation->set_rules('res_address', 'Residential Address', 'trim|required');
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('city_town', display('city_town'), 'trim|required');
+        $this->form_validation->set_rules('city_town', 'Town', 'trim|required');
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('country', display('country'), 'required');
+        $this->form_validation->set_rules('country', 'Country', 'required');
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('id_type', display('id_type'), 'required');
+        $this->form_validation->set_rules('id_type', 'ID Type', 'required');
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('id_num', display('id_num'), 'required');
+        $this->form_validation->set_rules('id_num', 'ID Number', 'required');
+
+        $this->form_validation->set_rules('sponsor_id', 'Referral Code', 'required');
         // print_r($_FILES);
         // die();
         // $files = $this->request->getFiles();
@@ -106,7 +108,7 @@ class Signup extends REST_Controller
         }
 
         if (!empty($allImagesEmptyErrors)) {
-            return $this->response($allImagesEmptyErrors, REST_Controller::HTTP_OK);
+            return $this->response(['success' => FALSE, 'message' => implode(', ', $allImagesEmptyErrors)], REST_Controller::HTTP_OK);
         }
 
 
@@ -134,14 +136,11 @@ class Signup extends REST_Controller
             // die();
             // return $this->response(['Testing'], REST_Controller::HTTP_OK);
 
-            // $sponsor_user_id = $this->db->select('user_id')->where('user_id', $this->input->cookie('sponsor_id'))->get('user_registration')->row();
+            $sponsor_user_id = $this->db->select('user_id')->where('user_id', $this->input->post('sponsor_id'))->get('user_registration')->row();
 
-            // if (!$sponsor_user_id) {
-            //     // $this->session->set_flashdata('exception', "Valid Sponsor ID Required");
-            //     // redirect("register");
-            //     return $this->response(['Sponsor Id invalid'], REST_Controller::HTTP_OK);
-            //     return false;
-            // }
+            if (!$sponsor_user_id) {
+                return $this->response(['success' => FALSE, 'message' => 'Referral Code not valid'], REST_Controller::HTTP_OK);
+            }
 
             $dlanguage = $this->db->select('language')->get('setting')->row();
             $data = array();
@@ -185,7 +184,7 @@ class Signup extends REST_Controller
                 //     $this->session->set_flashdata('message', display('account_create_success_social'));
                 //     redirect('register#tab2');
                 // } else {
-                return $this->response(['Email and username used'], REST_Controller::HTTP_OK);
+                return $this->response(['success' => FALSE, 'message' => 'Email and username used'], REST_Controller::HTTP_OK);
                 // $this->session->set_flashdata('exception', display('email_used') . " " . display('username_used'));
                 // redirect("register");
                 // }
@@ -240,15 +239,16 @@ class Signup extends REST_Controller
                 // if(empty($uploadErrors) ){
                 if (count($uploadErrors) > 0) {
                     // An error occurred in uploads, return the $uploadError
-                    print_r($_POST);
-                    die();
-                    return $this->response(['Error uploading one or more files'], REST_Controller::HTTP_OK);
+                    // print_r($_POST);
+                    // die();
+                    return $this->response(['success' => FALSE, 'message' => implode(', ', $uploadErrors)], REST_Controller::HTTP_OK);
+                    // return $this->response(['success'=> FALSE, 'message' => 'Error uploading one or more files'], REST_Controller::HTTP_OK);
                 }
 
                 $data = [
                     'f_name'        => $this->input->post('f_name'),
                     'l_name'        => $this->input->post('l_name'),
-                    // 'sponsor_id'    => $this->input->cookie('sponsor_id') != "" ? $this->input->cookie('sponsor_id') : '',
+                    'sponsor_id'    => $this->input->post('sponsor_id'),
                     'language'      => $dlanguage->language,
                     'user_id'       => $userid,
                     'username'      => $this->input->post('username'),
@@ -269,7 +269,7 @@ class Signup extends REST_Controller
                 ];
                 $duplicatemail = $this->app_model->checkDuplictemail($data);
                 if ($duplicatemail->num_rows() > 0) {
-                    return $this->response(['Email used'], REST_Controller::HTTP_OK);
+                    return $this->response(['success' => FALSE, 'message' => 'Email used'], REST_Controller::HTTP_OK);
                     // $this->session->set_flashdata('exception', display('email_used'));
                     // redirect("register");
                 }
@@ -277,7 +277,7 @@ class Signup extends REST_Controller
                 if ($checkDuplictuser->num_rows() > 0) {
                     // $this->session->set_flashdata('exception', display('username_used'));
                     // redirect("register");
-                    return $this->response(['Username used'], REST_Controller::HTTP_OK);
+                    return $this->response(['success' => FALSE, 'message' => 'Username used'], REST_Controller::HTTP_OK);
                 }
 
 
@@ -308,7 +308,13 @@ class Signup extends REST_Controller
             }
         }
 
-        $this->response(validation_errors(), REST_Controller::HTTP_OK);
+        $validation_errors = validation_errors();
+        $validation_errors = str_replace('<p>', '', $validation_errors);
+        $validation_errors = str_replace('</p>', ', ', $validation_errors);
+
+        $this->response(['success' => FALSE, 'message' => $validation_errors], REST_Controller::HTTP_OK);
+
+        // $this->response(['success'=> FALSE, 'message' => implode(', ' , validation_errors())], REST_Controller::HTTP_OK);
         // $this->load->view('website/header', $data);
         // $this->load->view('website/register', $data);
         // $this->load->view('website/footer', $data);
@@ -320,6 +326,7 @@ class Signup extends REST_Controller
     {
 
         $countryArray = array(
+            'GH' => array('name' => 'GHANA', 'code' => '233'),
             'AD' => array('name' => 'ANDORRA', 'code' => '376'),
             'AE' => array('name' => 'UNITED ARAB EMIRATES', 'code' => '971'),
             'AF' => array('name' => 'AFGHANISTAN', 'code' => '93'),
@@ -395,7 +402,6 @@ class Signup extends REST_Controller
             'GB' => array('name' => 'UNITED KINGDOM', 'code' => '44'),
             'GD' => array('name' => 'GRENADA', 'code' => '1473'),
             'GE' => array('name' => 'GEORGIA', 'code' => '995'),
-            'GH' => array('name' => 'GHANA', 'code' => '233'),
             'GI' => array('name' => 'GIBRALTAR', 'code' => '350'),
             'GL' => array('name' => 'GREENLAND', 'code' => '299'),
             'GM' => array('name' => 'GAMBIA', 'code' => '220'),
