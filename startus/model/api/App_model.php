@@ -168,6 +168,15 @@ class App_model extends CI_Model
             ->result();
     }
 
+    public function activePackage()
+    {
+        return $this->db->select("*")
+            ->from('package')
+            ->where('status', 1)
+            ->get()
+            ->result();
+    }
+
     public function contentDetails($slug = null)
     {
         return $this->db->select('*')

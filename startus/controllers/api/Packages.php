@@ -43,7 +43,7 @@
             $data['title'] = $this->uri->segment(1);
             $data['article'] = $this->app_model->article($cat_id->cat_id);
             $data['cat_info'] = $this->app_model->cat_info($this->uri->segment(1));
-            $data['package'] = $this->app_model->package();
+            $data['package'] = $this->app_model->activePackage();
 
             $this->response(['packages' => $data, 'success' => TRUE, 'message' => 'Packages successfully loaded'], REST_Controller::HTTP_OK);
 

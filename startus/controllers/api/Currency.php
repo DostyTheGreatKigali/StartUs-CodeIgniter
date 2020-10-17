@@ -1,68 +1,41 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-require APPPATH . 'libraries/REST_Controller.php';
-
-class Currency extends REST_Controller
+class Currency_model extends CI_Model
 {
 
-    public function __construct()
+    public function read($limit, $offset)
     {
-        parent::__construct();
-
-        // if (!$this->session->userdata('isLogIn'))
-        //     redirect('login');
-
-        // if (!$this->session->userdata('user_id'))
-        //     redirect('login');
-
-        $this->load->model(array(
-            'customer/currency_model'
-        ));
+        return $this->db->select("*")
+            ->from('crypto_currency')
+            ->order_by('rank', 'asc')
+            ->limit($limit, $offset)
+            ->get()
+            ->result();
     }
 
-    public function index_get()
+    public function all()
     {
+        return $this->db->select('*')
+            ->from('crypto_currency')
+            ->get()
+            ->result();
+    }
 
-        $data['title']  = display('cryptocurrency');
-        #-------------------------------#
-        #
-        #pagination starts
-        #
-        $config["base_url"] = base_url('customer/currency/index');
-        $config["total_rows"] = $this->db->count_all('crypto_currency');
-        $config["per_page"] = 25;
-        $config["uri_segment"] = 4;
-        $config["last_link"] = "Last";
-        $config["first_link"] = "First";
-        $config['next_link'] = 'Next';
-        $config['prev_link'] = 'Prev';
-        $config['full_tag_open'] = "<ul class='pagination col-xs pull-right'>";
-        $config['full_tag_close'] = "</ul>";
-        $config['num_tag_open'] = '<li>';
-        $config['num_tag_close'] = '</li>';
-        $config['cur_tag_open'] = "<li class='disabled'><li class='active'><a href='#'>";
-        $config['cur_tag_close'] = "<span class='sr-only'></span></a></li>";
-        $config['next_tag_open'] = "<li>";
-        $config['next_tag_close'] = "</li>";
-        $config['prev_tag_open'] = "<li>";
-        $config['prev_tagl_close'] = "</li>";
-        $config['first_tag_open'] = "<li>";
-        $config['first_tagl_close'] = "</li>";
-        $config['last_tag_open'] = "<li>";
-        $config['last_tagl_close'] = "</li>";
-        /* ends of bootstrap */
-        $this->pagination->initialize($config);
-        $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
-        $data['localcurrency'] = $this->currency_model->findlocalCurrency();
-        $data['currency'] = $this->currency_model->read($config["per_page"], $page);
-        // $data["links"] = $this->pagination->create_links();
-        #
-        #pagination ends
-        #    
-        $this->response(['currencies' => $data, 'success' => TRUE, 'message' => 'Packages successfully loaded'], REST_Controller::HTTP_OK);
-
-        // $data['content'] = $this->load->view("customer/currency/list", $data, true);
-        // $this->load->view("customer/layout/main_wrapper", $data);
+    public function activeCurrency()
+    {
+        return $this->db->select('*')
+            ->from('crypto_currency')
+            ->where('status', 1)
+            ->get()
+            ->result();
+    }
+    public function findlocalCurrency()
+    {
+        return $this->db->select('usd_exchange_rate, currency_name, currency_iso_code, currency_symbol, currency_position')
+            ->from('local_currency')
+            ->where('currency_id', 1)
+            ->get()
+            ->row();
     }
 }
