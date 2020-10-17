@@ -44,6 +44,29 @@ class Buy extends REST_Controller
         return $this->response(['success' => TRUE, 'purchaseInfo' => $data], REST_Controller::HTTP_OK);
     }
 
+    public function buyInfo_get()
+    {
+
+        $post_user_data = $this->db->select('*')
+            ->from('user_registration')
+            ->where('user_id', $this->input->get('user_id'))
+            ->where('api_token', $this->input->get('api_token'))
+            ->get()
+            ->result();
+        // var_dump($post_user_data); die;
+        if (empty($post_user_data)) {
+            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
+        }
+
+        $user_id = $this->input->post('user_id');
+
+        $data['payment_gateway']         = $this->common_model->payment_gateway();
+        $data['currency']                 = $this->buy_model->findExcCurrency();
+        $data['selectedlocalcurrency']     = $this->buy_model->findlocalCurrency();
+        #------------------------#
+        return $this->response(['success' => TRUE, 'purchaseInfo' => $data], REST_Controller::HTTP_OK);
+    }
+
     public function index()
     {
         $data['currency'] = $this->buy_model->findExcCurrency();
