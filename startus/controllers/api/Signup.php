@@ -23,7 +23,7 @@ class Signup extends REST_Controller
         // File configs
         $config['upload_path']          = './upload/api/users';
         $config['allowed_types']        = 'gif|jpg|png|jpeg';
-        $config['max_size']             = 500;
+        $config['max_size']             = 2048;
         // if ($this->session->userdata('isLogIn'))
         //     redirect(base_url());
         //  return $this->response($_FILES, REST_Controller::HTTP_OK);
@@ -61,7 +61,7 @@ class Signup extends REST_Controller
         $this->form_validation->set_rules('email', 'Email', "required|valid_email|max_length[100]");
         // print_r($_POST);
         // die();
-        $this->form_validation->set_rules('pass', 'Password', 'required|min_length[8]|max_length[32]|matches[r_pass]');
+        $this->form_validation->set_rules('pass', 'Password', 'required|min_length[6]|max_length[32]|matches[r_pass]');
         // print_r($_POST);
         // die();
         $this->form_validation->set_rules('r_pass', 'Password', 'trim');

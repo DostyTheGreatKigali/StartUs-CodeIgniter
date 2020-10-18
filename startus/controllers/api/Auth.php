@@ -77,6 +77,13 @@ class Auth extends REST_Controller
                 return    $this->response(['success' => FALSE, 'message' => 'Invalid credentials'], REST_Controller::HTTP_OK);
             }
         }
+
+
+        $validation_errors = validation_errors();
+        $validation_errors = str_replace('<p>', '', $validation_errors);
+        $validation_errors = str_replace('</p>', ', ', $validation_errors);
+
+        $this->response(['success' => FALSE, 'message' => $validation_errors], REST_Controller::HTTP_OK);
     }
 
 
