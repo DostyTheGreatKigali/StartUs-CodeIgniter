@@ -202,7 +202,7 @@ class Signup extends REST_Controller
                 }
                 $uploadedFiles[] = $this->upload->data();
                 // We need a different file name
-                $extensionTwoeArray = explode('/', $_FILES['user_id_image']['type']);
+                $extensionTwoArray = explode('/', $_FILES['user_id_image']['type']);
                 //  print_r($extensionTwoArray); die;
                 $config['file_name'] = uniqid() . '.' . round(microtime(true) * 1000) . '.' . $extensionTwoArray[1];
                 $config['file_name'] = uniqid() . '.' . round(microtime(true) * 1000);
