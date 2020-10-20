@@ -68,8 +68,6 @@ class Auth extends REST_Controller
                     'country'       => $user->row()->country,
                     'lastname'       => $user->row()->l_name,
                     'firstname'       => $user->row()->f_name,
-                    'status'       => $user->row()->status,
-                    'account_creation_date'       => $user->row()->created,
                     'api_token'       => $api_token
                     //$user->row()->api_token,
                 );
