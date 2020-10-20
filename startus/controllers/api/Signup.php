@@ -23,7 +23,7 @@ class Signup extends REST_Controller
         // File configs
         $config['upload_path']          = './upload/api/users';
         $config['allowed_types']        = 'gif|jpg|png|jpeg';
-        $config['max_size']             = 2048;
+        $config['max_size']             = 10240;
         // if ($this->session->userdata('isLogIn'))
         //     redirect(base_url());
         //  return $this->response($_FILES, REST_Controller::HTTP_OK);
