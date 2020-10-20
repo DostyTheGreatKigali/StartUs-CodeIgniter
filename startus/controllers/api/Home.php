@@ -32,7 +32,31 @@ class Home extends REST_Controller
 |   Customer Deshboard
 |-------------------------------------
 */
-    public function index_get()
+
+    public function homeInfo_post()
+    {
+        $post_user_data = $this->db->select('*')
+            ->from('user_registration')
+            ->where('user_id', $this->input->post('user_id'))
+            ->where('api_token', $this->input->post('api_token'))
+            ->get()
+            ->result();
+        // var_dump($post_user_data); die;
+        if (empty($post_user_data)) {
+            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
+        }
+
+        $user_id = $this->input->post('user_id');
+
+        $data['my_info']         = $this->deshboard_model->my_info();
+        // $data['currency']                 = $this->buy_model->findExcCurrency();
+        // $data['selectedlocalcurrency']     = $this->buy_model->findlocalCurrency();
+        #------------------------#
+        return $this->response(['success' => TRUE, 'myInfo' => $data], REST_Controller::HTTP_OK);
+    }
+
+
+    public function homeInfo_get()
     {
         // $user_id = $this->session->userdata('user_id');
         $post_user_data = $this->db->select('*')

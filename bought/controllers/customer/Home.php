@@ -73,14 +73,14 @@ class Home extends CI_Controller
         } else {
             $this->db->insert('bank_info', $bank_data);
         }
-        $this->session->set_flashdata('message', 'Bank Information Update Successfully!');
+        $this->session->set_flashdata('message', 'Bank Information Updated Successfully!');
         redirect("customer/home/");
     }
 
 
     /*
 |-------------------------------------
-|   Diposit pament for bitcoin
+|   Diposit payment for bitcoin
 |-------------------------------------
 */
     // public function payment()
