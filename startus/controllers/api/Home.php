@@ -8,21 +8,24 @@ class Home extends REST_Controller
 
     public function __construct()
     {
+        // print_r($_POST);
+        // die();
         parent::__construct();
 
         // if (!$this->session->userdata('isLogIn'))
         //     redirect('customer');
 
         $this->load->model(array(
-
+            'api/dashboard_model',
             'customer/auth_model',
             'customer/diposit_model',
-            'customer/deshboard_model',
             'customer/profile_model',
             'customer/buy_model',
             'common_model',
-
         ));
+        // print_r($_POST);
+        // die();
+        // parent::__construct();
     }
 
 
@@ -33,31 +36,11 @@ class Home extends REST_Controller
 |-------------------------------------
 */
 
-    public function homeInfo_post()
-    {
-        $post_user_data = $this->db->select('*')
-            ->from('user_registration')
-            ->where('user_id', $this->input->post('user_id'))
-            ->where('api_token', $this->input->post('api_token'))
-            ->get()
-            ->result();
-        // var_dump($post_user_data); die;
-        if (empty($post_user_data)) {
-            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
-        }
-
-        $user_id = $this->input->post('user_id');
-
-        $data['my_info']         = $this->deshboard_model->my_info();
-        // $data['currency']                 = $this->buy_model->findExcCurrency();
-        // $data['selectedlocalcurrency']     = $this->buy_model->findlocalCurrency();
-        #------------------------#
-        return $this->response(['success' => TRUE, 'myInfo' => $data], REST_Controller::HTTP_OK);
-    }
-
 
     public function homeInfo_get()
     {
+        // print_r($_POST);
+        // die();
         // $user_id = $this->session->userdata('user_id');
         $post_user_data = $this->db->select('*')
             ->from('user_registration')
@@ -65,11 +48,17 @@ class Home extends REST_Controller
             ->where('api_token', $this->input->get('api_token'))
             ->get()
             ->result();
-        // var_dump($post_user_data); die;
+        // print_r($_POST);
+        // die();
+        // var_dump($post_user_data);
+        // die;
         if (empty($post_user_data)) {
+            // print_r($_POST);
+            // die();
             return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
         }
 
+        // $user_id = $this->session->set_userdata('user_id', $user_id);
         $user_id = $this->input->get('user_id');
 
         $data = $this->deshboard_model->get_cata_wais_transections();
@@ -94,7 +83,7 @@ class Home extends REST_Controller
     public function bank_info_update()
     {
 
-        $user_id = $this->session->userdata('user_id');
+        $user_id = $this->session->set_userdata('user_id', $user_id);
 
         $bank_data = array(
             'user_id'           => $this->session->userdata('user_id'),
