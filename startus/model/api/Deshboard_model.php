@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
-class Dashboard_model extends CI_Model
+class Deshboard_model extends CI_Model
 {
 
     public function get_cata_wais_transections($user_id)

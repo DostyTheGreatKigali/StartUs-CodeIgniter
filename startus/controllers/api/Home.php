@@ -16,7 +16,7 @@ class Home extends REST_Controller
         //     redirect('customer');
 
         $this->load->model(array(
-            'api/dashboard_model',
+            'api/deshboard_model',
             'customer/auth_model',
             'customer/diposit_model',
             'customer/profile_model',
@@ -57,16 +57,20 @@ class Home extends REST_Controller
             // die();
             return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
         }
-
+        // print_r($_POST);
+        // die();
         // $user_id = $this->session->set_userdata('user_id', $user_id);
         $user_id = $this->input->get('user_id');
-
-        $data = $this->deshboard_model->get_cata_wais_transections();
-        $data['package'] = $this->deshboard_model->all_package();
-        $data['info'] = $this->deshboard_model->my_info();
-        $data['my_payout'] = $this->deshboard_model->my_payout();
-        $data['my_sales'] = $this->deshboard_model->my_sales();
-        $data['pending_withdraw'] = $this->deshboard_model->pending_withdraw();
+        // print_r($_POST);
+        // die();
+        $data = $this->deshboard_model->get_cata_wais_transections($user_id);
+        // print_r($_POST);
+        // die();
+        $data['package'] = $this->deshboard_model->all_package($user_id);
+        $data['info'] = $this->deshboard_model->my_info($user_id);
+        $data['my_payout'] = $this->deshboard_model->my_payout($user_id);
+        $data['my_sales'] = $this->deshboard_model->my_sales($user_id);
+        $data['pending_withdraw'] = $this->deshboard_model->pending_withdraw($user_id);
         $data['level_info'] = $this->deshboard_model->my_level_information($user_id);
 
         $data['investment'] = $this->deshboard_model->my_total_investment($user_id);
