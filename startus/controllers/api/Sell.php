@@ -147,7 +147,7 @@ class Sell extends REST_Controller
             $this->form_validation->set_rules('om_name', display('om_name'), 'required');
             $this->form_validation->set_rules('om_mobile', display('om_mobile'), 'required');
             $this->form_validation->set_rules('transaction_no', display('transaction_no'), 'required');
-            $this->form_validation->set_rules('idcard_no', display('idcard_no'), 'required');
+            // $this->form_validation->set_rules('idcard_no', display('idcard_no'), 'required');
         }
 
         if (!$this->input->valid_ip($this->input->ip_address())) {

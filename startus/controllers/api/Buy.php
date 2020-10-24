@@ -12,7 +12,8 @@ class Buy extends REST_Controller
 
         $this->load->model(array(
 
-            'customer/buy_model',
+            'api/buy_model',
+            // 'customer/buy_model',
             'customer/diposit_model',
             'customer/profile_model',
             'common_model',
@@ -110,7 +111,7 @@ class Buy extends REST_Controller
         $this->load->view("customer/layout/main_wrapper", $data);
     }
 
-    public function index_post()
+    public function index_post($buy_id = null)
     {
 
         $post_user_data = $this->db->select('*')
@@ -164,44 +165,113 @@ class Buy extends REST_Controller
         // $this->form_validation->set_rules('usd_amount', display('usd_amount'), 'required');
         // $this->form_validation->set_rules('rate_coin', display('rate_coin'), 'required');
         // $this->form_validation->set_rules('local_amount', display('local_amount'), 'required');
+        $this->form_validation->set_rules('ref_id', display('reference_id'), 'required');
 
         if ($this->input->post('payment_method') == 'bitcoin' || $this->input->post('payment_method') == 'payeer') {
-            $this->form_validation->set_rules('comments', display('comments'), 'required');
+            // $this->form_validation->set_rules('comments', display('comments'), 'required');
+            $this->form_validation->set_rules('bank_account_name', display('bank_account_name'), 'required');
+            $this->form_validation->set_rules('bank_account_num', display('bank_account_num'), 'required');
         }
         if ($this->input->post('payment_method') == 'phone') {
             $this->form_validation->set_rules('om_name', display('om_name'), 'required');
             $this->form_validation->set_rules('om_mobile', display('om_mobile'), 'required');
             $this->form_validation->set_rules('transaction_no', display('transaction_no'), 'required');
-            $this->form_validation->set_rules('idcard_no', display('idcard_no'), 'required');
+            // $this->form_validation->set_rules('idcard_no', display('idcard_no'), 'required');
         }
 
         if (!$this->input->valid_ip($this->input->ip_address())) {
             return false;
         }
 
+
+        //set config 
+        $config = [
+            'upload_path'       => 'upload/document/',
+            'allowed_types'     => 'gif|jpg|png|jpeg|pdf',
+            'overwrite'         => false,
+            'maintain_ratio'     => true,
+            'encrypt_name'      => true,
+            'remove_spaces'     => true,
+            'file_ext_tolower'     => true
+        ];
+        $this->load->library('upload', $config);
+        if ($this->upload->do_upload('document')) {
+            $data = $this->upload->data();
+            $image = $config['upload_path'] . $data['file_name'];
+
+            // $this->session->set_flashdata('message', display("image_upload_successfully"));
+        }
+
+
+        $sdata['buy']   = (object)$userdata = array(
+            'coin_id'                  => $this->input->post('cid', TRUE),
+            'user_id'                  => $user_id,
+            'coin_wallet_id'          => $this->input->post('wallet_id', TRUE),
+            'transection_type'      => "buy",
+            'coin_amount'              => $coins_amount, //$this->input->post('buy_amount', TRUE),
+            'usd_amount'              => $selected_data['payableusd'], //$this->input->post('usd_amount', TRUE),
+            'local_amount'          => $selected_data['payablelocal'], //$this->input->post('local_amount', TRUE),
+            'payment_method'          => $this->input->post('payment_method', TRUE),
+            'request_ip'              => $this->input->ip_address(),
+            'verification_code'     => "",
+            // 'payment_details'          => $this->input->post('comments', TRUE),
+            'rate_coin'              => $selected_data['price_usd'], //$this->input->post('rate_coin', TRUE),
+            'document_status'          => 0,
+            'om_name'                => $this->input->post('om_name', TRUE),
+            'om_mobile'                => $this->input->post('om_mobile', TRUE),
+            'transaction_no'        => $this->input->post('transaction_no', TRUE),
+            'ref_id'        => $this->input->post('ref_id'),
+            'admin_ref_id'        => $this->input->post('ref_id'),
+            'bank_account_name'        => $this->input->post('bank_account_name'),
+            'bank_account_num'        => $this->input->post('bank_account_num'),
+            // 'idcard_no'                => $this->input->post('idcard_no', TRUE),
+            'status'                  => 1
+        );
+
+
         if ($this->form_validation->run()) {
+            if (empty($buy_id)) {
+                if ($this->buy_model->create($userdata)) {
+                    if (!empty($image)) {
+                        $data['document']   = (object)$documentdata = array(
+                            'ext_exchange_id'      => $this->db->insert_id(),
+                            'doc_url'              => (!empty($image) ? $image : '')
+                        );
+                        $this->buy_model->documentcreate($documentdata);
+                    }
 
+                    // $this->session->set_flashdata('message', display('save_successfully'));
+                    // return $this->response(['success' => TRUE, 'message' => display('save_successfully')], REST_Controller::HTTP_OK);
+                } else {
+                    // if (data['ref_id'] != data['admin_ref_id']) {
+                    //     return $this->response(['success' => FALSE, 'message' => "Invalid Reference ID"], REST_Controller::HTTP_OK);
+                    // }
+                    return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
+                    // $this->session->set_flashdata('exception', display('please_try_again'));
+                }
+                // redirect("customer/sell/form/");
+            }
 
-            $sdata['buy']   = (object)$userdata = array(
-                'coin_id'                  => $this->input->post('cid', TRUE),
-                'user_id'                  => $user_id,
-                'coin_wallet_id'          => $this->input->post('wallet_id', TRUE),
-                'transection_type'      => "buy",
-                'coin_amount'              => $coins_amount, //$this->input->post('buy_amount', TRUE),
-                'usd_amount'              => $selected_data['payableusd'], //$this->input->post('usd_amount', TRUE),
-                'local_amount'          => $selected_data['payablelocal'], //$this->input->post('local_amount', TRUE),
-                'payment_method'          => $this->input->post('payment_method', TRUE),
-                'request_ip'              => $this->input->ip_address(),
-                'verification_code'     => "",
-                'payment_details'          => $this->input->post('comments', TRUE),
-                'rate_coin'              => $selected_data['price_usd'], //$this->input->post('rate_coin', TRUE),
-                'document_status'          => 0,
-                'om_name'                => $this->input->post('om_name', TRUE),
-                'om_mobile'                => $this->input->post('om_mobile', TRUE),
-                'transaction_no'        => $this->input->post('transaction_no', TRUE),
-                'idcard_no'                => $this->input->post('idcard_no', TRUE),
-                'status'                  => 1
-            );
+            // $sdata['buy']   = (object)$userdata = array(
+            //     'coin_id'                  => $this->input->post('cid', TRUE),
+            //     'user_id'                  => $user_id,
+            //     'coin_wallet_id'          => $this->input->post('wallet_id', TRUE),
+            //     'transection_type'      => "buy",
+            //     'coin_amount'              => $coins_amount, //$this->input->post('buy_amount', TRUE),
+            //     'usd_amount'              => $selected_data['payableusd'], //$this->input->post('usd_amount', TRUE),
+            //     'local_amount'          => $selected_data['payablelocal'], //$this->input->post('local_amount', TRUE),
+            //     'payment_method'          => $this->input->post('payment_method', TRUE),
+            //     'request_ip'              => $this->input->ip_address(),
+            //     'verification_code'     => "",
+            //     'payment_details'          => $this->input->post('comments', TRUE),
+            //     'rate_coin'              => $selected_data['price_usd'], //$this->input->post('rate_coin', TRUE),
+            //     'document_status'          => 0,
+            //     'om_name'                => $this->input->post('om_name', TRUE),
+            //     'om_mobile'                => $this->input->post('om_mobile', TRUE),
+            //     'transaction_no'        => $this->input->post('transaction_no', TRUE),
+            //     'idcard_no'                => $this->input->post('idcard_no', TRUE),
+            //     'status'                  => 1
+            // );
 
             $ext_exchange_id = $this->buy_model->create($userdata);
             // $ext_exchange_id = $this->buy_model->create($sdata['buy']);
@@ -240,6 +310,11 @@ class Buy extends REST_Controller
         if (empty($post_user_data)) {
             return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
         }
+
+        $this->load->helper('string');
+
+        $admin_ref_id = strtoupper(random_string('alnum', 9));
+        $data['admin_ref_id']   = $admin_ref_id;
 
         $cid     = $this->input->post('cid');
         // $amount = $this->input->post('amount');
