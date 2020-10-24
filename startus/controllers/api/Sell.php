@@ -97,6 +97,11 @@ class Sell extends REST_Controller
         $user_id = $this->input->post('user_id');
 
         // $data['title']  = display('add_sell');
+        if (!isset($_POST['payable_usd']) || empty($this->input->post('payable_usd'))) {
+            return $this->response(['success' => FALSE, 'message' => 'payable usd required'], REST_Controller::HTTP_OK);
+        }
+
+        $payable_usd = $this->input->post('payable_usd');
 
         // $data['payment_gateway'] = $this->common_model->payment_gateway();
         // $data['currency'] = $this->sell_model->findExcCurrency();
@@ -109,13 +114,15 @@ class Sell extends REST_Controller
         $selected_data['selectedlocalcurrency'] = $this->sell_model->findlocalCurrency();
 
         $selected_data['price_usd']         = $this->getPercentOfNumber($selected_data['selectedcryptocurrency']->price_usd, $selected_data['selectedexccurrency']->sell_adjustment) + $selected_data['selectedcryptocurrency']->price_usd;
-        $payableusd             = $selected_data['price_usd'] * $this->input->post('sell_amount');
+        $payableusd             = $this->input->post('payable_usd'); //$selected_data['price_usd']*$this->input->post('sell_amount');
         $selected_data['payableusd']     = $payableusd;
         $selected_data['payablelocal']     = $payableusd * $selected_data['selectedlocalcurrency']->usd_exchange_rate;
         // End of  calculation like public function sellPayable_post()
+        $coins_amount   = $payableusd / $selected_data['price_usd'];;
 
         $this->form_validation->set_rules('cid', display('coin_name'), 'required');
-        $this->form_validation->set_rules('sell_amount', display('sell_amount'), 'required');
+        // $this->form_validation->set_rules('sell_amount', display('sell_amount'),'required');
+        $this->form_validation->set_rules('payable_usd', 'payable_usd', 'required');
         $this->form_validation->set_rules('wallet_id', display('wallet_data'), 'required');
         $this->form_validation->set_rules('payment_method', display('payment_method'), 'required');
         // $this->form_validation->set_rules('usd_amount', display('usd_amount'),'required');
@@ -161,7 +168,7 @@ class Sell extends REST_Controller
             'user_id'                  => $user_id,
             'coin_wallet_id'          => $this->input->post('wallet_id'),
             'transection_type'      => "sell",
-            'coin_amount'              => $this->input->post('sell_amount'),
+            'coin_amount'              => $coins_amount, //$this->input->post('sell_amount'),
             'usd_amount'              => $selected_data['payableusd'], //$this->input->post('usd_amount'),
             'local_amount'          => $selected_data['payablelocal'], //$this->input->post('local_amount'),
             'payment_method'          => $this->input->post('payment_method'),
@@ -207,7 +214,7 @@ class Sell extends REST_Controller
             // 	redirect("customer/sell/form/$sell_id");
             // }
         } else {
-            return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
+            return $this->response(['success' => FALSE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
             // if(!empty($sell_id)) {
             // 	$data['title'] = display('edit_sell');
             // 	$data['sell']   = $this->sell_model->single($sell_id);
@@ -234,19 +241,24 @@ class Sell extends REST_Controller
 
 
         $cid = $this->input->post('cid');
-        $amount = $this->input->post('amount');
+        // $amount = $this->input->post('amount');
+        $payable_usd = $this->input->post('payable_usd');
 
         $data['selectedcryptocurrency'] = $this->sell_model->findCurrency($cid);
         $data['selectedexccurrency'] = $this->sell_model->findExchangeCurrency($cid);
         $data['selectedlocalcurrency'] = $this->sell_model->findlocalCurrency();
-        if (!empty($amount)) {
+        // if (!empty($amount)) {
+        if (!empty($payable_usd)) {
             $data['price_usd']         = $this->getPercentOfNumber($data['selectedcryptocurrency']->price_usd, $data['selectedexccurrency']->sell_adjustment) + $data['selectedcryptocurrency']->price_usd;
-            $payableusd             = $data['price_usd'] * $amount;
+            $payableusd             =  $payable_usd; //;$data['price_usd']*$amount;
+            $coins_quantity = $payableusd / $data['price_usd'];
             $data['payableusd']     = $payableusd;
             $data['payablelocal']     = $payableusd * $data['selectedlocalcurrency']->usd_exchange_rate;
+            $data['coins_quantity']   = $coins_quantity;
         } else {
             $data['payableusd']     = 0;
             $data['payablelocal']   = 0;
+            $data['coins_quantity']   = 0;
             if (empty($cid)) {
                 $data['price_usd']  = 0;
             } else {

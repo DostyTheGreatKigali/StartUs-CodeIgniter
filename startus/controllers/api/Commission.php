@@ -125,44 +125,44 @@ class Commission extends REST_Controller
         #
         #pagination starts
         #
-        $config["base_url"] = base_url('customer/commission/my_commission');
-        $config["total_rows"] = $this->db->select("earnings.*,user_registration.*,package.*")
-            ->from('earnings')
-            ->join('user_registration', 'user_registration.user_id=earnings.Purchaser_id')
-            ->join('package', 'package.package_id=earnings.package_id')
-            ->where('earnings.user_id', $user_id)
-            ->where('earnings.earning_type', 'type1')
-            ->get()->num_rows();
-        $config["per_page"] = 25;
-        $config["uri_segment"] = 4;
-        $config["last_link"] = "Last";
-        $config["first_link"] = "First";
-        $config['next_link'] = 'Next';
-        $config['prev_link'] = 'Prev';
-        $config['full_tag_open'] = "<ul class='pagination col-xs pull-right'>";
-        $config['full_tag_close'] = "</ul>";
-        $config['num_tag_open'] = '<li>';
-        $config['num_tag_close'] = '</li>';
-        $config['cur_tag_open'] = "<li class='disabled'><li class='active'><a href='#'>";
-        $config['cur_tag_close'] = "<span class='sr-only'></span></a></li>";
-        $config['next_tag_open'] = "<li>";
-        $config['next_tag_close'] = "</li>";
-        $config['prev_tag_open'] = "<li>";
-        $config['prev_tagl_close'] = "</li>";
-        $config['first_tag_open'] = "<li>";
-        $config['first_tagl_close'] = "</li>";
-        $config['last_tag_open'] = "<li>";
-        $config['last_tagl_close'] = "</li>";
+        // $config["base_url"] = base_url('customer/commission/my_commission');
+        // $config["total_rows"] = $this->db->select("earnings.*,user_registration.*,package.*")
+        //     ->from('earnings')
+        //     ->join('user_registration', 'user_registration.user_id=earnings.Purchaser_id')
+        //     ->join('package', 'package.package_id=earnings.package_id')
+        //     ->where('earnings.user_id', $user_id)
+        //     ->where('earnings.earning_type', 'type1')
+        //     ->get()->num_rows();
+        // $config["per_page"] = 25;
+        // $config["uri_segment"] = 4;
+        // $config["last_link"] = "Last";
+        // $config["first_link"] = "First";
+        // $config['next_link'] = 'Next';
+        // $config['prev_link'] = 'Prev';
+        // $config['full_tag_open'] = "<ul class='pagination col-xs pull-right'>";
+        // $config['full_tag_close'] = "</ul>";
+        // $config['num_tag_open'] = '<li>';
+        // $config['num_tag_close'] = '</li>';
+        // $config['cur_tag_open'] = "<li class='disabled'><li class='active'><a href='#'>";
+        // $config['cur_tag_close'] = "<span class='sr-only'></span></a></li>";
+        // $config['next_tag_open'] = "<li>";
+        // $config['next_tag_close'] = "</li>";
+        // $config['prev_tag_open'] = "<li>";
+        // $config['prev_tagl_close'] = "</li>";
+        // $config['first_tag_open'] = "<li>";
+        // $config['first_tagl_close'] = "</li>";
+        // $config['last_tag_open'] = "<li>";
+        // $config['last_tagl_close'] = "</li>";
         /* ends of bootstrap */
-        $this->pagination->initialize($config);
-        $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
+        // $this->pagination->initialize($config);
+        // $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
         $data['my_commission'] = $this->db->select("earnings.*,user_registration.*,package.*")
             ->from('earnings')
             ->join('user_registration', 'user_registration.user_id=earnings.Purchaser_id')
             ->join('package', 'package.package_id=earnings.package_id')
             ->where('earnings.user_id', $user_id)
             ->where('earnings.earning_type', 'type1')
-            ->limit($config["per_page"], $page)
+            // ->limit($config["per_page"], $page)
             ->get()
             ->result();
         // $data["links"] = $this->pagination->create_links();

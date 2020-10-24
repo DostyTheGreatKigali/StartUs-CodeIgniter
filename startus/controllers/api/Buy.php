@@ -44,6 +44,28 @@ class Buy extends REST_Controller
         return $this->response(['success' => TRUE, 'purchaseInfo' => $data], REST_Controller::HTTP_OK);
     }
 
+    public function buyInfo_get()
+    {
+
+        $post_user_data = $this->db->select('*')
+            ->from('user_registration')
+            ->where('user_id', $this->input->get('user_id'))
+            ->where('api_token', $this->input->get('api_token'))
+            ->get()
+            ->result();
+        // var_dump($post_user_data); die;
+        if (empty($post_user_data)) {
+            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
+        }
+
+        $user_id = $this->input->post('user_id');
+
+        $data['payment_gateway']         = $this->common_model->payment_gateway();
+        $data['currency']                 = $this->buy_model->findExcCurrency();
+        $data['selectedlocalcurrency']     = $this->buy_model->findlocalCurrency();
+        #------------------------#
+        return $this->response(['success' => TRUE, 'purchaseInfo' => $data], REST_Controller::HTTP_OK);
+    }
 
     public function index()
     {
@@ -109,6 +131,11 @@ class Buy extends REST_Controller
         // if ($this->session->userdata('buy')) {
         // 	$this->session->unset_userdata('buy');
         // }
+        if (!isset($_POST['payable_usd']) || empty($this->input->post('payable_usd'))) {
+            return $this->response(['success' => FALSE, 'message' => 'payable usd required'], REST_Controller::HTTP_OK);
+        }
+
+        $payable_usd = $this->input->post('payable_usd');
 
         // $data['payment_gateway'] 		= $this->common_model->payment_gateway();
         // $data['currency'] 				= $this->buy_model->findExcCurrency();
@@ -119,18 +146,19 @@ class Buy extends REST_Controller
         $selected_data['selectedexccurrency']     = $this->buy_model->findExchangeCurrency($this->input->post('cid'));
         $selected_data['selectedlocalcurrency']     = $this->buy_model->findlocalCurrency();
         $selected_data['price_usd']         = $this->getPercentOfNumber($selected_data['selectedcryptocurrency']->price_usd, $selected_data['selectedexccurrency']->buy_adjustment) + $selected_data['selectedcryptocurrency']->price_usd;
-        // $payableusd             = $selected_data['price_usd'] * $this->input->post('usd_amount');
-        $payableusd             = $selected_data['price_usd'];
+        $payableusd             = $this->input->post('payable_usd'); //$selected_data['price_usd']*$this->input->post('buy_amount');
         $selected_data['payableusd']     = $payableusd;
         $selected_data['payablelocal']     = $payableusd * $selected_data['selectedlocalcurrency']->usd_exchange_rate;
         // End of  calculation like public function buyPayable_post()
+        $coins_amount   = $payableusd / $selected_data['price_usd'];;
 
         // return $this->response(['success' => FALSE, 'message' => $selected_data], REST_Controller::HTTP_OK);
 
         // return $this->response(['success' => FALSE, 'message' => $data], REST_Controller::HTTP_OK);
 
         $this->form_validation->set_rules('cid', display('coin_name'), 'required');
-        $this->form_validation->set_rules('buy_amount', display('buy_amount'), 'required');
+        // $this->form_validation->set_rules('buy_amount', display('buy_amount'), 'required');
+        $this->form_validation->set_rules('payable_usd', 'payable_usd', 'required');
         $this->form_validation->set_rules('wallet_id', display('wallet_data'), 'required');
         $this->form_validation->set_rules('payment_method', display('payment_method'), 'required');
         // $this->form_validation->set_rules('usd_amount', display('usd_amount'), 'required');
@@ -159,9 +187,8 @@ class Buy extends REST_Controller
                 'user_id'                  => $user_id,
                 'coin_wallet_id'          => $this->input->post('wallet_id', TRUE),
                 'transection_type'      => "buy",
-                'coin_amount'              => $this->input->post('buy_amount', TRUE),
+                'coin_amount'              => $coins_amount, //$this->input->post('buy_amount', TRUE),
                 'usd_amount'              => $selected_data['payableusd'], //$this->input->post('usd_amount', TRUE),
-                // 'usd_amount'              => $this->input->post('usd_amount', TRUE), //$selected_data['payableusd'], //$this->input->post('usd_amount', TRUE),
                 'local_amount'          => $selected_data['payablelocal'], //$this->input->post('local_amount', TRUE),
                 'payment_method'          => $this->input->post('payment_method', TRUE),
                 'request_ip'              => $this->input->ip_address(),
@@ -215,20 +242,24 @@ class Buy extends REST_Controller
         }
 
         $cid     = $this->input->post('cid');
-        $amount = $this->input->post('amount');
+        // $amount = $this->input->post('amount');
+        $payable_usd = $this->input->post('payable_usd');
 
         $data['selectedcryptocurrency'] = $this->buy_model->findCurrency($cid);
         $data['selectedexccurrency']     = $this->buy_model->findExchangeCurrency($cid);
         $data['selectedlocalcurrency']     = $this->buy_model->findlocalCurrency();
-        if (!empty($amount)) {
+        // if (!empty($amount)) {
+        if (!empty($payable_usd)) {
             $data['price_usd']         = $this->getPercentOfNumber($data['selectedcryptocurrency']->price_usd, $data['selectedexccurrency']->buy_adjustment) + $data['selectedcryptocurrency']->price_usd;
-            // $payableusd             = $data['price_usd'];
-            $payableusd             = $data['price_usd'] * $amount;
+            $payableusd             =  $payable_usd; //;$data['price_usd']*$amount;
+            $coins_quantity = $payableusd / $data['price_usd'];
             $data['payableusd']     = $payableusd;
             $data['payablelocal']     = $payableusd * $data['selectedlocalcurrency']->usd_exchange_rate;
+            $data['coins_quantity']   = $coins_quantity;
         } else {
             $data['payableusd']     = 0;
             $data['payablelocal']   = 0;
+            $data['coins_quantity']   = 0;
             if (empty($cid)) {
                 $data['price_usd']  = 0;
             } else {
