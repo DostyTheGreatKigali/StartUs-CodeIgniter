@@ -94,6 +94,8 @@ class Sell extends REST_Controller
             return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
         }
 
+        // $this->load->helper('string');
+
         $user_id = $this->input->post('user_id');
 
         // $data['title']  = display('add_sell');
@@ -101,7 +103,7 @@ class Sell extends REST_Controller
             return $this->response(['success' => FALSE, 'message' => 'payable usd required'], REST_Controller::HTTP_OK);
         }
 
-        $admin_ref_id = strtoupper(random_string('alnum', 9));
+        // $admin_ref_id = strtoupper(random_string('alnum', 9));
 
         $payable_usd = $this->input->post('payable_usd');
 
@@ -109,7 +111,7 @@ class Sell extends REST_Controller
         // $data['currency'] = $this->sell_model->findExcCurrency();
         // $data['selectedlocalcurrency'] = $this->sell_model->findlocalCurrency();
         #------------------------#
-        $selected_data['admin_ref_id']   = $admin_ref_id;
+        // $selected_data['admin_ref_id']   = $admin_ref_id;
 
         // Calculate like buypayable will at public function sellPayable_post()
         $selected_data['selectedcryptocurrency'] = $this->sell_model->findCurrency($this->input->post('cid'));
@@ -132,6 +134,7 @@ class Sell extends REST_Controller
         // $this->form_validation->set_rules('usd_amount', display('usd_amount'),'required');
         // $this->form_validation->set_rules('rate_coin', display('rate_coin'),'required');
         // $this->form_validation->set_rules('local_amount', display('local_amount'),'required');
+        // $this->form_validation->set_rules('admin_ref_id', display('admin_reference_id'), 'required');
         $this->form_validation->set_rules('ref_id', display('reference_id'), 'required');
 
         if ($this->input->post('payment_method') == 'bitcoin' || $this->input->post('payment_method') == 'payeer') {
@@ -152,22 +155,22 @@ class Sell extends REST_Controller
         }
 
         //set config 
-        // $config = [
-        //     'upload_path'       => 'upload/document/',
-        //     'allowed_types'     => 'gif|jpg|png|jpeg|pdf',
-        //     'overwrite'         => false,
-        //     'maintain_ratio'     => true,
-        //     'encrypt_name'      => true,
-        //     'remove_spaces'     => true,
-        //     'file_ext_tolower'     => true
-        // ];
-        // $this->load->library('upload', $config);
-        // if ($this->upload->do_upload('document')) {
-        //     $data = $this->upload->data();
-        //     $image = $config['upload_path'] . $data['file_name'];
+        $config = [
+            'upload_path'       => 'upload/document/',
+            'allowed_types'     => 'gif|jpg|png|jpeg|pdf',
+            'overwrite'         => false,
+            'maintain_ratio'     => true,
+            'encrypt_name'      => true,
+            'remove_spaces'     => true,
+            'file_ext_tolower'     => true
+        ];
+        $this->load->library('upload', $config);
+        if ($this->upload->do_upload('document')) {
+            $data = $this->upload->data();
+            $image = $config['upload_path'] . $data['file_name'];
 
-        //     // $this->session->set_flashdata('message', display("image_upload_successfully"));
-        // }
+            // $this->session->set_flashdata('message', display("image_upload_successfully"));
+        }
 
         /*-----------------------------------*/
         $data['sell']   = (object)$userdata = array(
@@ -181,7 +184,7 @@ class Sell extends REST_Controller
             'payment_method'          => $this->input->post('payment_method'),
             'request_ip'              => $this->input->ip_address(),
             'verification_code'     => "",
-            'payment_details'          => $this->input->post('comments'),
+            // 'payment_details'          => $this->input->post('comments'),
             'rate_coin'              => $selected_data['price_usd'], //$this->input->post('rate_coin'),
             // 'document_status'          => (!empty($image) ? 1 : 0),
             'om_name'                => $this->input->post('om_name'),
@@ -189,7 +192,7 @@ class Sell extends REST_Controller
             'transaction_no'        => $this->input->post('transaction_no'),
             // 'idcard_no'                => $this->input->post('idcard_no'),
             'ref_id'        => $this->input->post('ref_id'),
-            'admin_ref_id'        => $admin_ref_id,
+            'admin_ref_id'        => $this->input->post('ref_id'),
             'bank_account_name'        => $this->input->post('bank_account_name'),
             'bank_account_num'        => $this->input->post('bank_account_num'),
             'status'                  => 1
@@ -199,17 +202,20 @@ class Sell extends REST_Controller
         if ($this->form_validation->run()) {
             if (empty($sell_id)) {
                 if ($this->sell_model->create($userdata)) {
-                    // if (!empty($image)) {
-                    //     $data['document']   = (object)$documentdata = array(
-                    //         'ext_exchange_id'      => $this->db->insert_id(),
-                    //         'doc_url'              => (!empty($image) ? $image : '')
-                    //     );
-                    //     $this->sell_model->documentcreate($documentdata);
-                    // }
+                    if (!empty($image)) {
+                        $data['document']   = (object)$documentdata = array(
+                            'ext_exchange_id'      => $this->db->insert_id(),
+                            'doc_url'              => (!empty($image) ? $image : '')
+                        );
+                        $this->sell_model->documentcreate($documentdata);
+                    }
 
                     // $this->session->set_flashdata('message', display('save_successfully'));
                     return $this->response(['success' => TRUE, 'message' => display('save_successfully')], REST_Controller::HTTP_OK);
                 } else {
+                    // if (data['ref_id'] != data['admin_ref_id']) {
+                    //     return $this->response(['success' => FALSE, 'message' => "Invalid Reference ID"], REST_Controller::HTTP_OK);
+                    // }
                     return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
                     // $this->session->set_flashdata('exception', display('please_try_again'));
                 }
@@ -249,9 +255,10 @@ class Sell extends REST_Controller
         if (empty($post_user_data)) {
             return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
         }
+        $this->load->helper('string');
 
         $admin_ref_id = strtoupper(random_string('alnum', 9));
-
+        $data['admin_ref_id']   = $admin_ref_id;
         $cid = $this->input->post('cid');
         // $amount = $this->input->post('amount');
         $payable_usd = $this->input->post('payable_usd');
@@ -267,7 +274,6 @@ class Sell extends REST_Controller
             $data['payableusd']     = $payableusd;
             $data['payablelocal']     = $payableusd * $data['selectedlocalcurrency']->usd_exchange_rate;
             $data['coins_quantity']   = $coins_quantity;
-            $data['admin_ref_id']   = $admin_ref_id;
         } else {
             $data['payableusd']     = 0;
             $data['payablelocal']   = 0;
