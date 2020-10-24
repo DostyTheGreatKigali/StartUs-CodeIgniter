@@ -106,13 +106,42 @@ class Withdraw extends REST_Controller
         $user_id = $this->input->post('user_id');
 
         $this->form_validation->set_rules('amount', display('amount'), 'required');
+        $this->form_validation->set_rules('method', display('payment_method'), 'required|alpha_numeric|trim');
         // $this->form_validation->set_rules('varify_media', 'OTP Send To', 'required'); 
         $this->form_validation->set_rules('walletid', 'Wallet id', 'required');
 
         $appSetting = $this->common_model->get_setting();
 
-        if ($this->form_validation->run()) {
+        $date           = new DateTime();
+        $deposit_date   = $date->format('Y-m-d H:i:s');
 
+        if ($this->form_validation->run()) {
+            if ($this->input->post('method') == 'phone') {
+                $mobiledata =  array(
+                    'om_name'         => $this->input->post('om_name', TRUE),
+                    'om_mobile'       => $this->input->post('om_mobile', TRUE),
+                    // 'transaction_no'  => $this->input->post('transaction_no', TRUE),
+                    // 'idcard_no'       => $this->input->post('idcard_no', TRUE),
+                );
+
+                $comment = json_encode($mobiledata);
+            } else if ($this->input->post('method') == 'payeer') {
+
+                $comment = $this->input->post('comments', TRUE);
+                (object)$depositdata = array(
+                    'user_id'           => $user_id,
+                    'deposit_amount'    => $this->input->post('amount', TRUE),
+                    'deposit_method'    => $this->input->post('method', TRUE),
+                    'fees'              => $this->input->post('fees', TRUE),
+                    'comments'          => $comment,
+                    'deposit_date'      => $deposit_date,
+                    'deposit_ip'        => $this->input->ip_address(),
+                );
+
+                $deposit = $this->diposit_model->save_deposit($depositdata);
+            } else if ($this->input->post('method') == 'bank') { } else {
+                $comment = $this->input->post('comments', TRUE);
+            }
             $varify_media = 2; //$this->input->post('varify_media');
             $varify_code = $this->randomID();
             #----------------------------
@@ -122,14 +151,60 @@ class Withdraw extends REST_Controller
             #----------------------------
             // print("on balance true checks"); die;
 
-            if ($blance != true) {
+            // if ($blance != true) {
+            if ($blance == true) {
                 // print("balance is not true " .$blance); die;
-                return $this->response(['success' => FALSE, 'message' => display('balance_is_unavailable')], REST_Controller::HTTP_OK);
+                // return $this->response(['success' => FALSE, 'message' => display('balance_is_unavailable')], REST_Controller::HTTP_OK);
 
                 // $this->session->set_flashdata('exception', display('balance_is_unavailable'));
                 // redirect('customer/withdraw');
 
+                $withdraw = array(
+                    'user_id  ' => $user_id,
+                    'amount' => $this->input->post('amount'),
+                    // 'fees' => @$fees,
+                    'walletid' => $this->input->post('walletid'),
+                    'request_ip' => $this->input->ip_address(),
+                    'request_date' => date('Y-m-d h:i:s'),
+                    'method' => $this->input->post('method')
+                );
+
+
+                $varify_data = array(
+
+                    'ip_address' => $this->input->ip_address(),
+                    'user_id' => $user_id,
+                    'session_id' => $user_id,
+                    'verify_code' => $varify_code,
+                    'data' => json_encode($withdraw)
+
+                );
+
+                $result = $this->transfer_model->save_transfer_verify($varify_data);
+
+                // Executing public function withdraw_verify() with focus on only insert and updates
+                $withdrawal_result = $this->withdraw_model->withdraw($withdraw);
+
+                $transections_data = array(
+                    'user_id'                   => $user_id,
+                    'transection_category'      => 'withdraw',
+                    'releted_id'                => $withdrawal_result['withdraw_id'],
+                    'amount'                    => $withdraw['amount'],
+                    'transection_date_timestamp' => date('Y-m-d h:i:s')
+                );
+
+                $this->transections_model->save_transections($transections_data);
+                $this->db->set('status', 0)
+                    ->where('id', $result['id'])
+                    ->where('session_id', $user_id)
+                    ->update('verify_tbl');
+
+                // redirect('customer/withdraw/confirm_withdraw/'.$result['id']);
+                // }    
+                return $this->response(['success' => FALSE, 'message' => 'Withdrawal request sent please wait for approval'], REST_Controller::HTTP_OK);
             } else {
+
+                return $this->response(['success' => FALSE, 'message' => display('balance_is_unavailable')], REST_Controller::HTTP_OK);
                 // print("balance is  true".$blance); die;
 
 
@@ -170,54 +245,54 @@ class Withdraw extends REST_Controller
                 // if($code_send!=NULL){
 
                 // get withdraw fees
-                $fees = $this->fees_load($this->input->post('amount'), $this->input->post('method'), 'withdraw');
+                // $fees = $this->fees_load($this->input->post('amount'), $this->input->post('method'), 'withdraw');
                 #-----------------------
-                $withdraw = array(
-                    'user_id  ' => $user_id,
-                    'amount' => $this->input->post('amount'),
-                    'fees' => @$fees,
-                    'walletid' => $this->input->post('walletid'),
-                    'request_ip' => $this->input->ip_address(),
-                    'request_date' => date('Y-m-d h:i:s'),
-                    'method' => $this->input->post('method')
-                );
+                // $withdraw = array(
+                //     'user_id  ' => $user_id,
+                //     'amount' => $this->input->post('amount'),
+                //     // 'fees' => @$fees,
+                //     'walletid' => $this->input->post('walletid'),
+                //     'request_ip' => $this->input->ip_address(),
+                //     'request_date' => date('Y-m-d h:i:s'),
+                //     'method' => $this->input->post('method')
+                // );
 
 
-                $varify_data = array(
+                // $varify_data = array(
 
-                    'ip_address' => $this->input->ip_address(),
-                    'user_id' => $user_id,
-                    'session_id' => $user_id,
-                    'verify_code' => $varify_code,
-                    'data' => json_encode($withdraw)
+                //     'ip_address' => $this->input->ip_address(),
+                //     'user_id' => $user_id,
+                //     'session_id' => $user_id,
+                //     'verify_code' => $varify_code,
+                //     'data' => json_encode($withdraw)
 
-                );
+                // );
 
-                $result = $this->transfer_model->save_transfer_verify($varify_data);
+                // $result = $this->transfer_model->save_transfer_verify($varify_data);
 
-                // Executing public function withdraw_verify() with focus on only insert and updates
-                $withdrawal_result = $this->withdraw_model->withdraw($withdraw);
+                // // Executing public function withdraw_verify() with focus on only insert and updates
+                // $withdrawal_result = $this->withdraw_model->withdraw($withdraw);
 
-                $transections_data = array(
-                    'user_id'                   => $user_id,
-                    'transection_category'      => 'withdraw',
-                    'releted_id'                => $withdrawal_result['withdraw_id'],
-                    'amount'                    => $withdraw['amount'],
-                    'transection_date_timestamp' => date('Y-m-d h:i:s')
-                );
+                // $transections_data = array(
+                //     'user_id'                   => $user_id,
+                //     'transection_category'      => 'withdraw',
+                //     'releted_id'                => $withdrawal_result['withdraw_id'],
+                //     'amount'                    => $withdraw['amount'],
+                //     'transection_date_timestamp' => date('Y-m-d h:i:s')
+                // );
 
-                $this->transections_model->save_transections($transections_data);
-                $this->db->set('status', 0)
-                    ->where('id', $result['id'])
-                    ->where('session_id', $user_id)
-                    ->update('verify_tbl');
+                // $this->transections_model->save_transections($transections_data);
+                // $this->db->set('status', 0)
+                //     ->where('id', $result['id'])
+                //     ->where('session_id', $user_id)
+                //     ->update('verify_tbl');
 
-                // redirect('customer/withdraw/confirm_withdraw/'.$result['id']);
-                // }    
-                return $this->response(['success' => FALSE, 'message' => 'Withdrawal request sent please wait for approval'], REST_Controller::HTTP_OK);
+                // // redirect('customer/withdraw/confirm_withdraw/'.$result['id']);
+                // // }    
+                // return $this->response(['success' => FALSE, 'message' => 'Withdrawal request sent please wait for approval'], REST_Controller::HTTP_OK);
             }
         } else {
-            return $this->response(['success' => FALSE, 'message' => 'Please send the right values'], REST_Controller::HTTP_OK);
+            return $this->response(['success' => FALSE, 'message' => 'Please send the right information'], REST_Controller::HTTP_OK);
 
             // $data['old'] = (object)$_POST;
             // $data['title']   = display('withdraw'); 
