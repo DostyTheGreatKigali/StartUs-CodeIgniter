@@ -192,7 +192,8 @@ class Buy extends REST_Controller
             'maintain_ratio'     => true,
             'encrypt_name'      => true,
             'remove_spaces'     => true,
-            'file_ext_tolower'     => true
+            'file_ext_tolower'     => true,
+            'max_size'     => 10240
         ];
         $this->load->library('upload', $config);
         if ($this->upload->do_upload('document')) {
