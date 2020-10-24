@@ -203,6 +203,14 @@ class Buy extends REST_Controller
             // $this->session->set_flashdata('message', display("image_upload_successfully"));
         }
 
+        // $allImagesEmptyErrors = [];
+        // if (empty($_FILES['document']['name'])) {
+        //     $allImagesEmptyErrors[] = 'Payment proof document is required';
+        //     // print_r($_FILES);
+        //     // die();
+        //     // $this->form_validation->set_rules('id_image', 'ID Image', 'required');
+        // }
+
 
         $sdata['buy']   = (object)$userdata = array(
             'coin_id'                  => $this->input->post('cid', TRUE),
@@ -247,7 +255,16 @@ class Buy extends REST_Controller
                     // if (data['ref_id'] != data['admin_ref_id']) {
                     //     return $this->response(['success' => FALSE, 'message' => "Invalid Reference ID"], REST_Controller::HTTP_OK);
                     // }
+                    //     $uploadedFiles = [];
+                    //     $uploadErrors = [];
+
+
+                    // if(!$this->upload->do_upload('document')) {
+                    //         $uploadErrors[] = $this->upload->display_errors();
+                    //     }
+
                     return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
+                    // return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
                     // $this->session->set_flashdata('exception', display('please_try_again'));
                 }
                 // redirect("customer/sell/form/");
