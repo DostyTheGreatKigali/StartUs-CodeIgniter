@@ -108,7 +108,7 @@ class Withdraw extends REST_Controller
         $this->form_validation->set_rules('amount', display('amount'), 'required');
         $this->form_validation->set_rules('method', display('payment_method'), 'required|alpha_numeric|trim');
         // $this->form_validation->set_rules('varify_media', 'OTP Send To', 'required'); 
-        $this->form_validation->set_rules('walletid', 'Wallet id', 'required');
+        // $this->form_validation->set_rules('walletid', 'Wallet id', 'required');
 
         $appSetting = $this->common_model->get_setting();
 
@@ -127,6 +127,7 @@ class Withdraw extends REST_Controller
                 $comment = json_encode($mobiledata);
             } else if ($this->input->post('method') == 'payeer') {
 
+                $this->form_validation->set_rules('walletid', 'Wallet id', 'required');
                 $comment = $this->input->post('comments', TRUE);
                 (object)$depositdata = array(
                     'user_id'           => $user_id,
@@ -166,7 +167,9 @@ class Withdraw extends REST_Controller
                     'walletid' => $this->input->post('walletid'),
                     'request_ip' => $this->input->ip_address(),
                     'request_date' => date('Y-m-d h:i:s'),
-                    'method' => $this->input->post('method')
+                    'method' => $this->input->post('method'),
+                    'om_name' => $this->input->post('om_name'),
+                    'om_mobile' => $this->input->post('om_mobile')
                 );
 
 
