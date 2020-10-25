@@ -18,8 +18,8 @@ class Investment extends REST_Controller
         $this->load->model(array(
             'customer/auth_model',
             'customer/package_model',
-            'customer/transections_model',
-            'customer/investment_model',
+            'api/transections_model',
+            'api/investment_model',
         ));
     }
 
@@ -36,10 +36,10 @@ class Investment extends REST_Controller
             return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
         }
 
-        $user_id = $this->input->post('user_id');
+        $user_id = $this->input->get('user_id');
 
         $data['title']   = display('investment');
-        $data['invest'] = $this->investment_model->all_investment();
+        $data['invest'] = $this->investment_model->all_investment($user_id);
         // $data['content'] = $this->load->view('customer/pages/investment', $data, true);
         return $this->response(['packageOrders' => $data, 'success' => TRUE, 'message' => 'All Packages orders loaded'], REST_Controller::HTTP_OK);
 
