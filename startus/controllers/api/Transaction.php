@@ -47,6 +47,31 @@ class Transaction extends REST_Controller
         // $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
     }
 
+    public function investment_get()
+    {
+        $post_user_data = $this->db->select('*')
+            ->from('user_registration')
+            ->where('user_id', $this->input->get('user_id'))
+            ->where('api_token', $this->input->get('api_token'))
+            ->get()
+            ->result();
+        // var_dump($post_user_data); die;
+        if (empty($post_user_data)) {
+            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
+        }
+
+        $user_id = $this->input->get('user_id');
+        // var_dump($post_user_data); die;
+
+        $data = $this->transections_model->get_cata_wais_transections($user_id);
+        $data['transection'] = $this->transections_model->investment_transection($user_id);
+        $data['title']   = display('transection');
+        // $data['content'] = $this->load->view('customer/pages/transection', $data, true);
+        // $this->load->view('customer/layout/main_wrapper', $data);
+        return $this->response(['success' => TRUE, 'transactionsInfo' => $data], REST_Controller::HTTP_OK);
+        // $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
+    }
+
     public function transection_details($id = NULL, $table = NULL)
     {
 

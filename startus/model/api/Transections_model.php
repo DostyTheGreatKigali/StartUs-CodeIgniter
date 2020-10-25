@@ -18,6 +18,15 @@ class Transections_model extends CI_Model
 			->get()
 			->result();
 	}
+	public function investment_transection($user_id)
+	{
+		return $this->db->select('*')
+			->from('transections')
+			->where('user_id', $user_id)
+			->where('transection_category', 'investment')
+			->get()
+			->result();
+	}
 
 	public function get_cata_wais_transections($user_id = "")
 	{
