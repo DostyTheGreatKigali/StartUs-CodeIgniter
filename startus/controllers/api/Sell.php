@@ -39,7 +39,7 @@ class Sell extends REST_Controller
         return $this->response(['success' => TRUE, 'purchaseInfo' => $data], REST_Controller::HTTP_OK);
     }
 
-    public function index()
+    public function index_get()
     {
         $data['title']  = display('sell');
         #-------------------------------#
@@ -72,12 +72,13 @@ class Sell extends REST_Controller
         $this->pagination->initialize($config);
         $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
         $data['sell'] = $this->sell_model->read($config["per_page"], $page);
-        $data["links"] = $this->pagination->create_links();
+        // $data["links"] = $this->pagination->create_links();
         #
         #pagination ends
         #    
-        $data['content'] = $this->load->view("customer/sell/list", $data, true);
-        $this->load->view("customer/layout/main_wrapper", $data);
+        // $data['content'] = $this->load->view("customer/sell/list", $data, true);
+        // $this->load->view("customer/layout/main_wrapper", $data);
+        return $this->response(['success' => TRUE, 'message' => 'All Sold Currencies and Coins loaded.', 'soldOrders' => $data], REST_Controller::HTTP_OK);
     }
 
     public function index_post($sell_id = null)
