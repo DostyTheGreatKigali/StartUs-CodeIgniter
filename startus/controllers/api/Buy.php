@@ -181,7 +181,7 @@ class Buy extends REST_Controller
         #    
         // $data['content'] = $this->load->view("customer/buy/list", $data, true);
         // $this->load->view("customer/layout/main_wrapper", $data);
-        return $this->response(['success' => TRUE, 'message' => 'Single Currency or Coin loaded.', 'orderDetails' => $data], REST_Controller::HTTP_OK);
+        return $this->response(['success' => TRUE, 'message' => 'Single Currency or Coin loaded.', 'buyOrderDetails' => $data], REST_Controller::HTTP_OK);
     }
 
     public function index_post($buy_id = null)
