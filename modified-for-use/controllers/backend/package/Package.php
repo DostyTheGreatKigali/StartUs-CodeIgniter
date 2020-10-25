@@ -91,7 +91,9 @@ class Package extends CI_Controller
         }
         #------------------------#
         $this->form_validation->set_rules('package_details', display('package_details'), 'max_length[1000]');
-        $this->form_validation->set_rules('package_amount', display('package_amount'), 'required|max_length[11]');
+        $this->form_validation->set_rules('min_amount', display('minimum_amount'), 'required|max_length[11]');
+        $this->form_validation->set_rules('max_amount', display('maximum_amount'), 'required|max_length[11]');
+        // $this->form_validation->set_rules('package_amount', display('package_amount'), 'required|max_length[11]');
         $this->form_validation->set_rules('daily_roi', display('daily_roi'), 'required|max_length[11]');
         $this->form_validation->set_rules('weekly_roi', display('weekly_roi'), 'required|max_length[11]');
         $this->form_validation->set_rules('monthly_roi', display('monthly_roi'), 'required|max_length[11]');
@@ -106,9 +108,9 @@ class Package extends CI_Controller
             'package_name'    => $this->input->post('package_name'),
             'period'            => $this->input->post('period'),
             'package_deatils' => $this->input->post('package_deatils'),
-            'min_amount'  => $this->input->post('min_amount'),
-            'max_amount'  => $this->input->post('max_amount'),
-            // 'package_amount'  => $this->input->post('package_amount'),
+            'min_amount'  => $this->input->post('l_amount'),
+            'max_amount'  => $this->input->post('h_amount'),
+            'package_amount'  => $this->input->post('package_amount'),
             'daily_roi'       => $this->input->post('daily_roi'),
             'weekly_roi'       => $this->input->post('weekly_roi'),
             'monthly_roi'       => $this->input->post('monthly_roi'),
