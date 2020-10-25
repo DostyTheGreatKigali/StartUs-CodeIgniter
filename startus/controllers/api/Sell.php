@@ -150,6 +150,7 @@ class Sell extends REST_Controller
         // $this->form_validation->set_rules('local_amount', display('local_amount'),'required');
         // $this->form_validation->set_rules('admin_ref_id', display('admin_reference_id'), 'required');
         $this->form_validation->set_rules('ref_id', display('reference_id'), 'required');
+        $this->form_validation->set_rules('coin_name', display('coin_name'), 'required');
 
         if ($this->input->post('payment_method') == 'bitcoin' || $this->input->post('payment_method') == 'payeer') {
             // $this->form_validation->set_rules('comments', display('comments'), 'required');
@@ -209,6 +210,7 @@ class Sell extends REST_Controller
             'admin_ref_id'        => $this->input->post('ref_id'),
             'bank_account_name'        => $this->input->post('bank_account_name'),
             'bank_account_num'        => $this->input->post('bank_account_num'),
+            'coin_name'        => $this->input->post('coin_name'),
             'status'                  => 1
         );
 
@@ -225,7 +227,7 @@ class Sell extends REST_Controller
                     }
 
                     // $this->session->set_flashdata('message', display('save_successfully'));
-                    return $this->response(['success' => TRUE, 'message' => display('save_successfully')], REST_Controller::HTTP_OK);
+                    return $this->response(['success' => TRUE, 'message' => 'Sell request successful'], REST_Controller::HTTP_OK);
                 } else {
                     // if (data['ref_id'] != data['admin_ref_id']) {
                     //     return $this->response(['success' => FALSE, 'message' => "Invalid Reference ID"], REST_Controller::HTTP_OK);
