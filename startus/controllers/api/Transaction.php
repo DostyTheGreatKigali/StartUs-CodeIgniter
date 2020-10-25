@@ -16,7 +16,7 @@ class Transaction extends REST_Controller
         //     redirect('login');
 
         $this->load->model(array(
-            'customer/transections_model',
+            'api/transections_model',
             'customer/Profile_model',
         ));
     }
@@ -35,11 +35,11 @@ class Transaction extends REST_Controller
             return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
         }
 
-        $user_id = $this->input->post('user_id');
+        $user_id = $this->input->get('user_id');
         // var_dump($post_user_data); die;
 
-        $data = $this->transections_model->get_cata_wais_transections();
-        $data['transection'] = $this->transections_model->all_transection();
+        $data = $this->transections_model->get_cata_wais_transections($user_id);
+        $data['transection'] = $this->transections_model->all_transection($user_id);
         $data['title']   = display('transection');
         // $data['content'] = $this->load->view('customer/pages/transection', $data, true);
         // $this->load->view('customer/layout/main_wrapper', $data);

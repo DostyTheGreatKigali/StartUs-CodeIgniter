@@ -35,21 +35,22 @@
                         <div class="form-group row">
                             <label for="minimum_amount" class="col-sm-4 col-form-label"><?php echo display('minimum_amount') ?> *</label>
                             <div class="col-sm-8">
-                                <input name="min_amount" value="<?php echo $package->min_amount ?>" class="form-control" placeholder="<?php echo display('minimum_amount') ?>" type="text" id="minimum_amount" data-toggle="tooltip" title="<?php echo display('tooltip_minimum_amount') ?>">
+                                <input name="minimum_amount" value="<?php echo $package->minimum_amount ?>" class="form-control" placeholder="<?php echo display('minimum_amount') ?>" type="text" id="minimum_amount" data-toggle="tooltip" title="<?php echo display('tooltip_minimum_amount') ?>">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="maximum_amount" class="col-sm-4 col-form-label"><?php echo display('maximum_amount') ?> *</label>
                             <div class="col-sm-8">
-                                <input name="max_amount" value="<?php echo $package->max_amount ?>" class="form-control" placeholder="<?php echo display('maximum_amount') ?>" type="text" id="maximum_amount" data-toggle="tooltip" title="<?php echo display('tooltip_maximum_amount') ?>">
+                                <input name="maximum_amount" value="<?php echo $package->maximum_amount ?>" class="form-control" placeholder="<?php echo display('maximum_amount') ?>" type="text" id="maximum_amount" data-toggle="tooltip" title="<?php echo display('tooltip_maximum_amount') ?>">
                             </div>
                         </div>
-                        <!-- <div class="form-group row">
+                        <!-- <div class="form-group row" style="display: none"> -->
+                        <div class="form-group row">
                             <label for="package_amount" class="col-sm-4 col-form-label"><?php echo display('package_amount') ?> *</label>
                             <div class="col-sm-8">
                                 <input name="package_amount" value="<?php echo $package->package_amount ?>" class="form-control" placeholder="<?php echo display('package_amount') ?>" type="text" id="package_amount" data-toggle="tooltip" title="<?php echo display('tooltip_package_amount') ?>">
                             </div>
-                        </div> -->
+                        </div>
                         <div class="form-group row">
                             <label for="daily_roi" class="col-sm-4 col-form-label"><?php echo display('daily_roi') ?> *</label>
                             <div class="col-sm-8">
