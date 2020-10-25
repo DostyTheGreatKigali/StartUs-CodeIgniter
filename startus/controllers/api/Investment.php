@@ -39,7 +39,7 @@ class Investment extends REST_Controller
         $user_id = $this->input->get('user_id');
 
         $data['title']   = display('investment');
-        $data['invest'] = $this->investment_model->all_investment($user_id);
+        $data['investedPackages'] = $this->investment_model->all_investment($user_id);
         // $data['content'] = $this->load->view('customer/pages/investment', $data, true);
         return $this->response(['packageOrders' => $data, 'success' => TRUE, 'message' => 'All Packages orders loaded'], REST_Controller::HTTP_OK);
 
