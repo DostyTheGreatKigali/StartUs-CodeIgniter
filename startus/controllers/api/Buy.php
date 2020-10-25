@@ -126,6 +126,64 @@ class Buy extends REST_Controller
         return $this->response(['success' => TRUE, 'message' => 'All Bought Currencies and Coins loaded.', 'boughtOrders' => $data], REST_Controller::HTTP_OK);
     }
 
+    public function details_get($ext_exchange_id = NULL)
+    {
+        $post_user_data = $this->db->select('*')
+            ->from('user_registration')
+            ->where('user_id', $this->input->get('user_id'))
+            ->where('api_token', $this->input->get('api_token'))
+            ->get()
+            ->result();
+        // var_dump($post_user_data); die;
+        if (empty($post_user_data)) {
+            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
+        }
+
+        $user_id = $this->input->get('user_id');
+
+        // $data['currency'] = $this->buy_model->findExcCurrency();
+
+        $data['title']  = display('buy_list');
+        #-------------------------------#
+        #
+        #pagination starts
+        #
+        $config["base_url"] = base_url('customer/buy/index');
+        $config["total_rows"] = $this->db->count_all('ext_exchange');
+        $config["per_page"] = 25;
+        $config["uri_segment"] = 4;
+        $config["last_link"] = "Last";
+        $config["first_link"] = "First";
+        $config['next_link'] = 'Next';
+        $config['prev_link'] = 'Prev';
+        $config['full_tag_open'] = "<ul class='pagination col-xs pull-right'>";
+        $config['full_tag_close'] = "</ul>";
+        $config['num_tag_open'] = '<li>';
+        $config['num_tag_close'] = '</li>';
+        $config['cur_tag_open'] = "<li class='disabled'><li class='active'><a href='#'>";
+        $config['cur_tag_close'] = "<span class='sr-only'></span></a></li>";
+        $config['next_tag_open'] = "<li>";
+        $config['next_tag_close'] = "</li>";
+        $config['prev_tag_open'] = "<li>";
+        $config['prev_tagl_close'] = "</li>";
+        $config['first_tag_open'] = "<li>";
+        $config['first_tagl_close'] = "</li>";
+        $config['last_tag_open'] = "<li>";
+        $config['last_tagl_close'] = "</li>";
+        /* ends of bootstrap */
+        $this->pagination->initialize($config);
+        // $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
+        $data['buy'] = $this->buy_model->single($ext_exchange_id, $user_id);
+        // $data['buy'] = $this->buy_model->read($config["per_page"], $page);
+        // $data["links"] = $this->pagination->create_links();
+        #
+        #pagination ends
+        #    
+        // $data['content'] = $this->load->view("customer/buy/list", $data, true);
+        // $this->load->view("customer/layout/main_wrapper", $data);
+        return $this->response(['success' => TRUE, 'message' => 'Single Currency or Coin loaded.', 'orderDetails' => $data], REST_Controller::HTTP_OK);
+    }
+
     public function index_post($buy_id = null)
     {
 
