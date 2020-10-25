@@ -1,30 +1,31 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Buy_model extends CI_Model
+class Sell_model extends CI_Model
 {
 
     public function create($data = array())
     {
         return $this->db->insert('ext_exchange', $data);
     }
-
     public function documentcreate($data = array())
     {
         return $this->db->insert('ext_document', $data);
     }
 
+    // public function read($limit, $offset)
     public function read($user_id)
     {
         return $this->db->select("*")
             ->from('ext_exchange')
             ->where('user_id', $user_id)
-            ->where('transection_type', 'buy')
+            ->where('transection_type', 'sell')
             ->order_by('ext_exchange_id', 'asc')
             // ->limit($limit, $offset)
             ->get()
             ->result();
     }
+
     public function single($ext_exchange_id = null, $user_id)
     {
         return $this->db->select('*')
@@ -34,15 +35,17 @@ class Buy_model extends CI_Model
             ->get()
             ->row();
     }
+
     public function all($user_id)
     {
         return $this->db->select('*')
             ->from('ext_exchange')
             ->where('user_id', $user_id)
-            ->where('transection_type', 'buy')
+            ->where('transection_type', 'sell')
             ->get()
             ->result();
     }
+
     public function update($data = array())
     {
         return $this->db->where('ext_exchange_id', $data["ext_exchange_id"])
@@ -89,15 +92,11 @@ class Buy_model extends CI_Model
     }
     public function findExchangeCurrency($coin_id = null)
     {
-        return $this->db->select('buy_adjustment, wallet_data, coin_name')
+        return $this->db->select('sell_adjustment, wallet_data, coin_name')
             ->from('ext_exchange_wallet')
             ->where('coin_id', $coin_id)
             ->where('status', 1)
             ->get()
             ->row();
-    }
-    public function payeerPayment($data = array())
-    {
-        return $this->db->insert('payeer_payments', $data);
     }
 }

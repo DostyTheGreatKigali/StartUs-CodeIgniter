@@ -70,6 +70,19 @@ class Buy extends REST_Controller
 
     public function index_get()
     {
+        $post_user_data = $this->db->select('*')
+            ->from('user_registration')
+            ->where('user_id', $this->input->get('user_id'))
+            ->where('api_token', $this->input->get('api_token'))
+            ->get()
+            ->result();
+        // var_dump($post_user_data); die;
+        if (empty($post_user_data)) {
+            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
+        }
+
+        $user_id = $this->input->get('user_id');
+
         $data['currency'] = $this->buy_model->findExcCurrency();
 
         $data['title']  = display('buy_list');
@@ -101,8 +114,9 @@ class Buy extends REST_Controller
         $config['last_tagl_close'] = "</li>";
         /* ends of bootstrap */
         $this->pagination->initialize($config);
-        $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
-        $data['buy'] = $this->buy_model->read($config["per_page"], $page);
+        // $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
+        $data['buy'] = $this->buy_model->read($user_id);
+        // $data['buy'] = $this->buy_model->read($config["per_page"], $page);
         // $data["links"] = $this->pagination->create_links();
         #
         #pagination ends
