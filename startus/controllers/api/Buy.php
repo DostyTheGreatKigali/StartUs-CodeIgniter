@@ -239,6 +239,7 @@ class Buy extends REST_Controller
         // $this->form_validation->set_rules('rate_coin', display('rate_coin'), 'required');
         // $this->form_validation->set_rules('local_amount', display('local_amount'), 'required');
         $this->form_validation->set_rules('ref_id', display('reference_id'), 'required');
+        $this->form_validation->set_rules('coin_name', display('coin_name'), 'required');
 
         if ($this->input->post('payment_method') == 'bitcoin' || $this->input->post('payment_method') == 'payeer') {
             // $this->form_validation->set_rules('comments', display('comments'), 'required');
@@ -306,6 +307,7 @@ class Buy extends REST_Controller
             'admin_ref_id'        => $this->input->post('ref_id'),
             'bank_account_name'        => $this->input->post('bank_account_name'),
             'bank_account_num'        => $this->input->post('bank_account_num'),
+            'coin_name'        => $this->input->post('coin_name'),
             // 'idcard_no'                => $this->input->post('idcard_no', TRUE),
             'status'                  => 1
         );
