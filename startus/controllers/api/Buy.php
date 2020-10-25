@@ -68,7 +68,7 @@ class Buy extends REST_Controller
         return $this->response(['success' => TRUE, 'purchaseInfo' => $data], REST_Controller::HTTP_OK);
     }
 
-    public function index()
+    public function index_get()
     {
         $data['currency'] = $this->buy_model->findExcCurrency();
 
@@ -103,12 +103,13 @@ class Buy extends REST_Controller
         $this->pagination->initialize($config);
         $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
         $data['buy'] = $this->buy_model->read($config["per_page"], $page);
-        $data["links"] = $this->pagination->create_links();
+        // $data["links"] = $this->pagination->create_links();
         #
         #pagination ends
         #    
-        $data['content'] = $this->load->view("customer/buy/list", $data, true);
-        $this->load->view("customer/layout/main_wrapper", $data);
+        // $data['content'] = $this->load->view("customer/buy/list", $data, true);
+        // $this->load->view("customer/layout/main_wrapper", $data);
+        return $this->response(['success' => TRUE, 'message' => 'All Bought Currencies and Coins loaded.', 'boughtOrders' => $data], REST_Controller::HTTP_OK);
     }
 
     public function index_post($buy_id = null)
