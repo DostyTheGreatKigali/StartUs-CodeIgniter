@@ -33,15 +33,15 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="minimum_amount" class="col-sm-4 col-form-label"><?php echo display('minimum_amount') ?> *</label>
+                            <label for="minimum_amount" class="col-sm-4 col-form-label"><?php echo "Minimum Amount" ?> *</label>
                             <div class="col-sm-8">
-                                <input name="minimum_amount" value="<?php echo $package->minimum_amount ?>" class="form-control" placeholder="<?php echo display('minimum_amount') ?>" type="text" id="minimum_amount" data-toggle="tooltip" title="<?php echo display('tooltip_minimum_amount') ?>">
+                                <input name="min_amount" value="<?php echo $package->minimum_amount ?>" class="form-control" placeholder="<?php echo display('minimum_amount') ?>" type="text" id="minimum_amount" data-toggle="tooltip" title="<?php echo display('tooltip_minimum_amount') ?>">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="maximum_amount" class="col-sm-4 col-form-label"><?php echo display('maximum_amount') ?> *</label>
+                            <label for="maximum_amount" class="col-sm-4 col-form-label"><?php echo "Maximum Amount" ?> *</label>
                             <div class="col-sm-8">
-                                <input name="maximum_amount" value="<?php echo $package->maximum_amount ?>" class="form-control" placeholder="<?php echo display('maximum_amount') ?>" type="text" id="maximum_amount" data-toggle="tooltip" title="<?php echo display('tooltip_maximum_amount') ?>">
+                                <input name="max_amount" value="<?php echo $package->maximum_amount ?>" class="form-control" placeholder="<?php echo display('maximum_amount') ?>" type="text" id="maximum_amount" data-toggle="tooltip" title="<?php echo display('tooltip_maximum_amount') ?>">
                             </div>
                         </div>
                         <!-- <div class="form-group row" style="display: none"> -->
