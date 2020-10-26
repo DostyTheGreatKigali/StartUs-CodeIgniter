@@ -156,6 +156,7 @@ class Sell extends REST_Controller
             // $this->form_validation->set_rules('comments', display('comments'), 'required');
             $this->form_validation->set_rules('bank_account_name', display('bank_account_name'), 'required');
             $this->form_validation->set_rules('bank_account_num', display('bank_account_num'), 'required');
+            $this->form_validation->set_rules('bank_name', display('bank_name'), 'required');
         }
 
         if ($this->input->post('payment_method') == 'phone') {
@@ -211,6 +212,7 @@ class Sell extends REST_Controller
             'bank_account_name'        => $this->input->post('bank_account_name'),
             'bank_account_num'        => $this->input->post('bank_account_num'),
             'coin_name'        => $this->input->post('coin_name'),
+            'bank_name'        => $this->input->post('bank_name'),
             'status'                  => 1
         );
 
