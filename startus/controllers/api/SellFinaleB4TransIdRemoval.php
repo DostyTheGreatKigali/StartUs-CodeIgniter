@@ -161,7 +161,7 @@ class Sell extends REST_Controller
         if ($this->input->post('payment_method') == 'phone') {
             $this->form_validation->set_rules('om_name', display('om_name'), 'required');
             $this->form_validation->set_rules('om_mobile', display('om_mobile'), 'required');
-            // $this->form_validation->set_rules('transaction_no', display('transaction_no'), 'required');
+            $this->form_validation->set_rules('transaction_no', display('transaction_no'), 'required');
             // $this->form_validation->set_rules('idcard_no', display('idcard_no'), 'required');
         }
 
@@ -204,7 +204,7 @@ class Sell extends REST_Controller
             // 'document_status'          => (!empty($image) ? 1 : 0),
             'om_name'                => $this->input->post('om_name'),
             'om_mobile'                => $this->input->post('om_mobile'),
-            // 'transaction_no'        => $this->input->post('transaction_no'),
+            'transaction_no'        => $this->input->post('transaction_no'),
             // 'idcard_no'                => $this->input->post('idcard_no'),
             'ref_id'        => $this->input->post('ref_id'),
             'admin_ref_id'        => $this->input->post('ref_id'),
