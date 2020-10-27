@@ -9,7 +9,7 @@ class Packagestats extends CI_Controller
         parent::__construct();
         $this->load->model(array(
 
-            'backend/deposit/deposit_model',
+            'backend/packages/packagestats_model',
             'customer/package_model',
             'customer/transections_model',
             'common_model',
