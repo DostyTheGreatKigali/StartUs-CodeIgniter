@@ -99,6 +99,9 @@ class Package extends CI_Controller
         $this->form_validation->set_rules('monthly_roi', display('monthly_roi'), 'required|max_length[11]');
         $this->form_validation->set_rules('yearly_roi', display('yearly_roi'), 'required|max_length[11]');
         $this->form_validation->set_rules('total_percent', display('total_percent'), 'required|max_length[11]');
+        $this->form_validation->set_rules('receive_int_period', display('receive_int_period'), 'required|max_length[11]');
+        $this->form_validation->set_rules('cash_back', display('cash_back'), 'required|max_length[11]');
+        $this->form_validation->set_rules('earns_rate', display('earns_rate'), 'required|max_length[11]');
         $this->form_validation->set_rules('status', display('status'), 'required|max_length[1]');
         $this->form_validation->set_rules('period', display('period'), 'required');
 
@@ -116,6 +119,9 @@ class Package extends CI_Controller
             'monthly_roi'       => $this->input->post('monthly_roi'),
             'yearly_roi'       => $this->input->post('yearly_roi'),
             'total_percent'   => $this->input->post('total_percent'),
+            'receive_int_period'       => $this->input->post('receive_int_period'),
+            'cash_back'   => $this->input->post('cash_back'),
+            'earns_rate'   => $this->input->post('earns_rate'),
             'status'          => $this->input->post('status'),
         );
 
