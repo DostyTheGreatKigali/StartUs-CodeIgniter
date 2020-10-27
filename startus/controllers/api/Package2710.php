@@ -69,53 +69,7 @@ class Package extends REST_Controller
 |   BUY PACKAGE 
 |--------------------------------------------------------------
 */
-
-
     public function buy_post()
-    {
-
-        $post_user_data = $this->db->select('*')
-            ->from('user_registration')
-            ->where('user_id', $this->input->post('user_id'))
-            ->where('api_token', $this->input->post('api_token'))
-            ->get()
-            ->result();
-        // var_dump($post_user_data); die;
-        if (empty($post_user_data)) {
-            return $this->response(['success' => FALSE, 'message' => 'Invalid token'], REST_Controller::HTTP_OK);
-        }
-
-        $user_id = $this->input->post('user_id');
-
-        $this->form_validation->set_rules('cid', display('coin_name'), 'required');
-        $this->form_validation->set_rules('buy_amount', display('buy_amount'), 'required');
-        $this->form_validation->set_rules('wallet_id', display('wallet_data'), 'required');
-        $this->form_validation->set_rules('package_id', 'package_id', 'required');
-
-        if ($this->form_validation->run()) {
-
-            $sdata = array(
-                'coin_id'                  => $this->input->post('cid', TRUE),
-                'user_id'                  => $user_id,
-                'wallet_address'          => $this->input->post('wallet_id', TRUE),
-                'buy_amount'              => $this->input->post('buy_amount', TRUE),
-                'package_id'              => $this->input->post('package_id', TRUE),
-                'status'                  => 1
-            );
-
-            $this->db->insert('pending_package_buying', $sdata);
-
-            return $this->response(['success' => TRUE, 'message' => 'Buy Request Successfully. Please wait for confirmation.'], REST_Controller::HTTP_OK);
-        }
-        $validation_errors = validation_errors();
-        $validation_errors = str_replace('<p>', '', $validation_errors);
-        $validation_errors = str_replace('</p>', ', ', $validation_errors);
-
-        $this->response(['success' => FALSE, 'message' => $validation_errors], REST_Controller::HTTP_OK);
-    }
-
-
-    public function buy_post_kept()
     {
 
         $user_data_fetch = $this->db->select('*')
