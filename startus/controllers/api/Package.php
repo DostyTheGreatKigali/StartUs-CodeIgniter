@@ -87,7 +87,7 @@ class Package extends REST_Controller
 
         $user_id = $this->input->post('user_id');
 
-        $this->form_validation->set_rules('cid', display('coin_name'), 'required');
+        // $this->form_validation->set_rules('cid', display('coin_name'), 'required');
         $this->form_validation->set_rules('buy_amount', display('buy_amount'), 'required');
         $this->form_validation->set_rules('wallet_id', display('wallet_data'), 'required');
         $this->form_validation->set_rules('package_id', 'package_id', 'required');
@@ -97,7 +97,7 @@ class Package extends REST_Controller
             $sdata = array(
                 'coin_id'                  => $this->input->post('cid', TRUE),
                 'user_id'                  => $user_id,
-                'wallet_address'          => $this->input->post('wallet_id', TRUE),
+                'wallet_id'          => $this->input->post('wallet_id', TRUE),
                 'buy_amount'              => $this->input->post('buy_amount', TRUE),
                 'package_id'              => $this->input->post('package_id', TRUE),
                 'status'                  => 1

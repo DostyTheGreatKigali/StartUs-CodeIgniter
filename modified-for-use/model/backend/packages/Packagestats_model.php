@@ -6,24 +6,24 @@ class Packagestats_model extends CI_Model
 
     public function create($data = array())
     {
-        return $this->db->insert('investment', $data);
+        return $this->db->insert('pending_package_buying', $data);
     }
 
     public function read($limit, $offset)
     {
         return $this->db->select("*")
-            ->from('investment')
-            ->order_by('invest_date', 'asc')
+            ->from('pending_package_buying')
+            ->order_by('package_request_date', 'asc')
             ->limit($limit, $offset)
             ->get()
             ->result();
     }
 
-    public function single($package_id = null)
+    public function single($pending_package_id = null)
     {
         return $this->db->select('*')
-            ->from('investment')
-            ->where('package_id', $package_id)
+            ->from('pending_package_buying')
+            ->where('pending_package_id', $pending_package_id)
             ->get()
             ->row();
     }
@@ -31,20 +31,20 @@ class Packagestats_model extends CI_Model
     public function all()
     {
         return $this->db->select('*')
-            ->from('investment')
+            ->from('pending_package_buying')
             ->get()
             ->result();
     }
 
     public function update($data = array())
     {
-        return $this->db->where('package_id', $data["package_id"])
-            ->update("investment", $data);
+        return $this->db->where('pending_package_id', $data["pending_package_id"])
+            ->update("pending_package_buying", $data);
     }
 
-    public function delete($package_id = null)
+    public function delete($pending_package_id = null)
     {
-        return $this->db->where('package_id', $package_id)
-            ->delete("investment");
+        return $this->db->where('pending_package_id', $pending_package_id)
+            ->delete("pending_package_buying");
     }
 }

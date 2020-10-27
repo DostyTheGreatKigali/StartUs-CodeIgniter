@@ -9,7 +9,7 @@ class Packagestats extends CI_Controller
         parent::__construct();
         $this->load->model(array(
 
-            'backend/package/packagestats_model',
+            'backend/deposit/deposit_model',
             'customer/package_model',
             'customer/transections_model',
             'common_model',
@@ -80,7 +80,7 @@ class Packagestats extends CI_Controller
         #pagination starts
         #
         $config["base_url"] = base_url('backend/package/packagestats/pending_package');
-        $config["total_rows"] = $this->db->get_where('pending_package_buying', array('status' => 1))->num_rows();
+        $config["total_rows"] = $this->db->get_where('deposit', array('status' => 0, 'deposit_method' => 'phone'))->num_rows();
         $config["per_page"] = 25;
         $config["uri_segment"] = 5;
         $config["last_link"] = "Last";
@@ -104,7 +104,7 @@ class Packagestats extends CI_Controller
         /* ends of bootstrap */
         $this->pagination->initialize($config);
         $page = ($this->uri->segment(5)) ? $this->uri->segment(5) : 0;
-        $data['pendingPackages'] = $this->db->select('*')->from('pending_package_buying')
+        $data['deposit'] = $this->db->select('*')->from('deposit')
             ->where('status', 1)
             // ->where('deposit_method', 'phone')
             ->limit($config["per_page"], $page)
