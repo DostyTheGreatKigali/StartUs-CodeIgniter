@@ -13,6 +13,7 @@ class Packagestats extends CI_Controller
             'customer/packageconfirmed_model',
             'customer/transections_model',
             'common_model',
+            'customer/diposit_model',
         ));
 
         if (!$this->session->userdata('isAdmin'))
@@ -120,7 +121,7 @@ class Packagestats extends CI_Controller
     }
 
 
-    public function old_confirm_package()
+    public function confirm_package()
     {
         $set_status = $_GET['set_status'];
         $user_id = $_GET['user_id'];
@@ -129,87 +130,127 @@ class Packagestats extends CI_Controller
             'status' => $set_status,
         );
 
-        $this->db->where('pending_package_id', $id)->where('user_id', $user_id)->update('pending_package_buying', $data);
 
-        $data = $this->db->select('*')->from('pending_package_buying')->where('pending_package_id', $id)->get()->row();
+        // Prevent admin from approving the same package twice
+        // Get the package info
+        $package_data = $this->db->select('*')->from('pending_package_buying')->where('pending_package_id', $id)->get()->row();
         $userdata = $this->db->select('*')->from('user_registration')->where('user_id', $user_id)->get()->row();
 
-        if ($data != NULL) {
-
-            $transections_data = array(
-                'user_id'                   => $data->user_id,
-                'transection_category'      => 'investment',
-                'releted_id'                => $data->pending_package_id,
-                'amount'                    => $data->buy_amount,
-                // 'comments'                  => "Deposite by OM Mobile",
-                'transection_date_timestamp' => date('Y-m-d h:i:s')
-            );
-            $this->packageconfirmed_model->save_transections($transections_data);
-        }
-
-        $set = $this->common_model->email_sms('email');
-        $appSetting = $this->common_model->get_setting();
-        #-----------------------------------------------------
-        $balance = $this->transections_model->get_cata_wais_transections($userdata->user_id);
-
-
-        #-----------------------------------------------------
-        if ($set->deposit != NULL) {
-            #----------------------------
-            #      email verify smtp
-            #----------------------------
-            $post = array(
-                'title'           => $appSetting->title,
-                'subject'           => 'Deposit',
-                'to'                => $userdata->email,
-                'message'           => 'You successfully deposit the amount $' . $data->deposit_amount . '. Your new balance is $' . $balance['balance'],
-            );
-            $send_email = $this->common_model->send_email($post);
-
-            if ($send_email) {
-                $n = array(
-                    'user_id'                => $userdata->user_id,
-                    'subject'                => display('diposit'),
-                    'notification_type'      => 'deposit',
-                    'details'                => 'You successfully deposit The amount $' . $data->deposit_amount . '. Your new balance is $' . $balance['balance'],
-                    'date'                   => date('Y-m-d h:i:s'),
-                    'status'                 => '1'
-                );
-                $this->db->insert('notifications', $n);
+        if ($package_data != NULL) {
+            // data exists now update it, check its status before approving
+            if ($package_data->status != 2) {
+                $this->db->where('pending_package_id', $id)->where('user_id', $user_id)->update('pending_package_buying', $data);
             }
 
-            $this->load->library('sms_lib');
-            $template = array(
-                'name'       => $userdata->f_name . " " . $userdata->l_name,
-                'amount'     => $data->deposit_amount,
-                'new_balance' => $balance['balance'],
-                'date'       => date('d F Y')
-            );
+            // Admin approved
+            if ($package_data->status != 2 && $set_status == 2) {
+                $date           = new DateTime();
+                $deposit_date   = $date->format('Y-m-d H:i:s');
 
-
-            #------------------------------
-            #   SMS Sending
-            #------------------------------
-            $send_sms = $this->sms_lib->send(array(
-                'to'              => $userdata->phone,
-                'header'         => 'Package Buying',
-                'template'        => 'You successfully deposit the amount $%amount% . Your new balance is $%new_balance%.',
-                'template_config' => $template,
-            ));
-
-            if ($send_sms) {
-
-                $message_data = array(
-                    'sender_id' => 1,
-                    'receiver_id' => $userdata->user_id,
-                    'subject' => 'Deposit',
-                    'message' => 'You successfully deposit the amount $' . $data->deposit_amount . '. Your new balance is $' . $balance['balance'],
-                    'datetime' => date('Y-m-d h:i:s'),
+                $sdata['deposit']   = (object)$userdata = array(
+                    'deposit_id'        => @$deposit['deposit_id'],
+                    'user_id'           => $user_id,
+                    'deposit_amount'    => $package_data->buy_amount,
+                    'deposit_method'    => 'coin', //$this->input->post('method', TRUE),
+                    'fees'              => 0, //$this->input->post('fees', TRUE),
+                    'comments'          => 'Package Deposit creation with coins',
+                    'deposit_date'      => $deposit_date,
+                    'deposit_ip'        => $this->input->ip_address(),
+                    'status'            => $set_status
                 );
+                $deposit = $this->diposit_model->save_deposit($sdata['deposit']);
+                // Grab your deposit id after creation
+                $deposit_id = $deposit->deposit_id;
 
-                $this->db->insert('message', $message_data);
+
+                if ($deposit != NULL) {
+
+                    $transections_data = array(
+                        'user_id'                   => $user_id,
+                        'transection_category'      => 'deposit',
+                        'releted_id'                => $deposit->deposit_id,
+                        'amount'                    => $deposit->deposit_amount,
+                        'comments'                  => "Deposite by OM Mobile",
+                        'transection_date_timestamp' => date('Y-m-d h:i:s')
+                    );
+                    $this->diposit_model->save_transections($transections_data);
+                }
             }
+
+            // // Data is updated. Now check if status is approved 3
+            // $transections_data = array(
+            //     'user_id'                   => $data->user_id,
+            //     'transection_category'      => 'investment',
+            //     'releted_id'                => $data->pending_package_id,
+            //     'amount'                    => $data->buy_amount,
+            //     // 'comments'                  => "Deposite by OM Mobile",
+            //     'transection_date_timestamp' => date('Y-m-d h:i:s')
+            // );
+            // $this->packageconfirmed_model->save_transections($transections_data);
         }
+
+        // $set = $this->common_model->email_sms('email');
+        // $appSetting = $this->common_model->get_setting();
+        // #-----------------------------------------------------
+        // $balance = $this->transections_model->get_cata_wais_transections($userdata->user_id);
+
+
+        // #-----------------------------------------------------
+        // if ($set->deposit != NULL) {
+        //     #----------------------------
+        //     #      email verify smtp
+        //     #----------------------------
+        //     $post = array(
+        //         'title'           => $appSetting->title,
+        //         'subject'           => 'Deposit',
+        //         'to'                => $userdata->email,
+        //         'message'           => 'You successfully deposit the amount $' . $data->deposit_amount . '. Your new balance is $' . $balance['balance'],
+        //     );
+        //     $send_email = $this->common_model->send_email($post);
+
+        //     if ($send_email) {
+        //         $n = array(
+        //             'user_id'                => $userdata->user_id,
+        //             'subject'                => display('diposit'),
+        //             'notification_type'      => 'deposit',
+        //             'details'                => 'You successfully deposit The amount $' . $data->deposit_amount . '. Your new balance is $' . $balance['balance'],
+        //             'date'                   => date('Y-m-d h:i:s'),
+        //             'status'                 => '1'
+        //         );
+        //         $this->db->insert('notifications', $n);
+        //     }
+
+        //     $this->load->library('sms_lib');
+        //     $template = array(
+        //         'name'       => $userdata->f_name . " " . $userdata->l_name,
+        //         'amount'     => $data->deposit_amount,
+        //         'new_balance' => $balance['balance'],
+        //         'date'       => date('d F Y')
+        //     );
+
+        //     #------------------------------
+        //     #   SMS Sending
+        //     #------------------------------
+        //     $send_sms = $this->sms_lib->send(array(
+        //         'to'              => $userdata->phone,
+        //         'header'         => 'Package Buying',
+        //         'template'        => 'You successfully deposit the amount $%amount% . Your new balance is $%new_balance%.',
+        //         'template_config' => $template,
+        //     ));
+
+        //     if ($send_sms) {
+
+        //         $message_data = array(
+        //             'sender_id' => 1,
+        //             'receiver_id' => $userdata->user_id,
+        //             'subject' => 'Deposit',
+        //             'message' => 'You successfully deposit the amount $' . $data->deposit_amount . '. Your new balance is $' . $balance['balance'],
+        //             'datetime' => date('Y-m-d h:i:s'),
+        //         );
+
+        //         $this->db->insert('message', $message_data);
+        //     }
+        // }
 
 
 
@@ -234,51 +275,4 @@ class Packagestats extends CI_Controller
 
         redirect('backend/package/packagestats/pending_package');
     }
-
-    // public function confirm_package()
-    // {
-    //     $set_status = $_GET['set_status'];
-    //     $user_id = $_GET['user_id'];
-    //     $id = $_GET['id'];
-    //     $data = array(
-    //         'status' => $set_status,
-    //     );
-
-    //     $confirmedPackage =  $this->db->where('pending_package_id', $id)->where('user_id', $user_id)->update('pending_package_buying', $data);
-    //     // If status is for approval create a deposit
-
-    //     if ($set_status == 2) {
-    //         // Figure out the values after each => below (OK)
-    //         $sdata['deposit']   = (object)$userdata = array(
-    //             'deposit_id'        => $confirmedPackage->pending_package_id,
-    //             'user_id'           => $user_id,
-    //             'deposit_amount'    => $confirmedPackage->buy_amount,
-    //             'deposit_method'    => "crypto",
-    //             'fees'              => "none",
-    //             'comments'          => "Package buying",
-    //             'deposit_date'      => $confirmedPackage->package_request_date,
-    //             'deposit_ip'        => $this->input->ip_address(),
-    //         );
-
-    //         $deposit = $this->diposit_model->save_deposit($sdata['deposit']);
-    //         // Grab your deposit id after creation
-    //         $deposit_id = $deposit->deposit_id;
-
-
-    //         if ($deposit != NULL) {
-
-    //             $transections_data = array(
-    //                 'user_id'                   => $user_id,
-    //                 'transection_category'      => 'deposit',
-    //                 'releted_id'                => $deposit->deposit_id,
-    //                 'amount'                    => $deposit->deposit_amount,
-    //                 'comments'                  => "Deposited by Cryptocurrency",
-    //                 'transection_date_timestamp' => date('Y-m-d h:i:s')
-    //             );
-    //             $this->diposit_model->save_transections($transections_data);
-    //         }
-    //     }
-
-    //     redirect('backend/package/packagestats/pending_package');
-    // }
 }
