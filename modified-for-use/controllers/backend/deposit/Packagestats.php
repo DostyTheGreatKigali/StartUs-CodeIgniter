@@ -120,7 +120,7 @@ class Packagestats extends CI_Controller
     }
 
 
-    public function confirm_package()
+    public function old_confirm_package()
     {
         $set_status = $_GET['set_status'];
         $user_id = $_GET['user_id'];
@@ -186,6 +186,7 @@ class Packagestats extends CI_Controller
                 'date'       => date('d F Y')
             );
 
+
             #------------------------------
             #   SMS Sending
             #------------------------------
@@ -233,4 +234,51 @@ class Packagestats extends CI_Controller
 
         redirect('backend/package/packagestats/pending_package');
     }
+
+    // public function confirm_package()
+    // {
+    //     $set_status = $_GET['set_status'];
+    //     $user_id = $_GET['user_id'];
+    //     $id = $_GET['id'];
+    //     $data = array(
+    //         'status' => $set_status,
+    //     );
+
+    //     $confirmedPackage =  $this->db->where('pending_package_id', $id)->where('user_id', $user_id)->update('pending_package_buying', $data);
+    //     // If status is for approval create a deposit
+
+    //     if ($set_status == 2) {
+    //         // Figure out the values after each => below (OK)
+    //         $sdata['deposit']   = (object)$userdata = array(
+    //             'deposit_id'        => $confirmedPackage->pending_package_id,
+    //             'user_id'           => $user_id,
+    //             'deposit_amount'    => $confirmedPackage->buy_amount,
+    //             'deposit_method'    => "crypto",
+    //             'fees'              => "none",
+    //             'comments'          => "Package buying",
+    //             'deposit_date'      => $confirmedPackage->package_request_date,
+    //             'deposit_ip'        => $this->input->ip_address(),
+    //         );
+
+    //         $deposit = $this->diposit_model->save_deposit($sdata['deposit']);
+    //         // Grab your deposit id after creation
+    //         $deposit_id = $deposit->deposit_id;
+
+
+    //         if ($deposit != NULL) {
+
+    //             $transections_data = array(
+    //                 'user_id'                   => $user_id,
+    //                 'transection_category'      => 'deposit',
+    //                 'releted_id'                => $deposit->deposit_id,
+    //                 'amount'                    => $deposit->deposit_amount,
+    //                 'comments'                  => "Deposited by Cryptocurrency",
+    //                 'transection_date_timestamp' => date('Y-m-d h:i:s')
+    //             );
+    //             $this->diposit_model->save_transections($transections_data);
+    //         }
+    //     }
+
+    //     redirect('backend/package/packagestats/pending_package');
+    // }
 }
