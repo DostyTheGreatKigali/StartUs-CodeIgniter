@@ -168,6 +168,7 @@ $settings = $this->db->select("*")
                             <li><a href="<?php echo base_url("backend/package/package/form") ?>"> <?php echo display('add_package') ?> </a></li>
                             <li><a href="<?php echo base_url("backend/package/package/") ?>"> <?php echo display('package_list') ?> </a></li>
                             <li><a href="<?php echo base_url("backend/package/packagestats/pending_package") ?>"> <?php echo "Pending Packages" ?> </a></li>
+                            <li><a href="<?php echo base_url("backend/package/packagestats/package_list") ?>"> <?php echo "Confirmed Packages" ?> </a></li>
                         </ul>
                     </li>
 

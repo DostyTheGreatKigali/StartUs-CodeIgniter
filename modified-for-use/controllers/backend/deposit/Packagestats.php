@@ -57,7 +57,7 @@ class Packagestats extends CI_Controller
         /* ends of bootstrap */
         $this->pagination->initialize($config);
         $page = ($this->uri->segment(5)) ? $this->uri->segment(5) : 0;
-        $data['confirmedPackages'] = $this->db->select('*')->from('pending_package_buying')
+        $data['packages'] = $this->db->select('*')->from('pending_package_buying')
             ->where('status', 2)
             // ->where('deposit_method', 'phone')
             ->limit($config["per_page"], $page)
@@ -104,7 +104,7 @@ class Packagestats extends CI_Controller
         /* ends of bootstrap */
         $this->pagination->initialize($config);
         $page = ($this->uri->segment(5)) ? $this->uri->segment(5) : 0;
-        $data['pendingPackages'] = $this->db->select('*')->from('pending_package_buying')
+        $data['packages'] = $this->db->select('*')->from('pending_package_buying')
             ->where('status', 1)
             // ->where('deposit_method', 'phone')
             ->limit($config["per_page"], $page)

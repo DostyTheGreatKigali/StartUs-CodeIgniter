@@ -26,9 +26,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (!empty($pendingPackages)) ?>
+                        <?php if (!empty($packages)) ?>
                         <?php $sl = 1; ?>
-                        <?php foreach ($pendingPackages as $value) { ?>
+                        <?php foreach ($packages as $value) { ?>
                             <tr>
                                 <td><?php echo $sl++; ?></td>
                                 <td><?php echo $value->user_id; ?></td>
@@ -38,7 +38,7 @@
                                 <?php if ($value->status == 1) { ?>
                                     <td><?php echo "Requested" ?></td>
                                 <?php } else if ($value->status == 2) { ?>
-                                    <td><?php echo "Pending" ?></td>
+                                    <td><?php echo "Approved" ?></td>
                                 <?php } else if ($value->status == 3) { ?>
                                     <td><?php echo "Approved" ?></td>
                                 <?php } else { ?>
