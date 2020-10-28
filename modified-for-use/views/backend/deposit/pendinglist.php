@@ -38,7 +38,7 @@
                                 <?php if ($value->status == 1) { ?>
                                     <td><?php echo "Requested" ?></td>
                                 <?php } else if ($value->status == 2) { ?>
-                                    <td><?php echo "Approved" ?></td>
+                                    <td><?php echo "Pending" ?></td>
                                 <?php } else if ($value->status == 3) { ?>
                                     <td><?php echo "Approved" ?></td>
                                 <?php } else { ?>
