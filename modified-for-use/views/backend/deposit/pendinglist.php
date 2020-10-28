@@ -38,7 +38,7 @@
                                 <?php if ($value->status == 1) { ?>
                                     <td><?php echo "Requested" ?></td>
                                 <?php } else if ($value->status == 2) { ?>
-                                    <td><?php echo "Pending" ?></td>
+                                    <td><?php echo "Approved" ?></td>
                                 <?php } else if ($value->status == 3) { ?>
                                     <td><?php echo "Approved" ?></td>
                                 <?php } else { ?>
@@ -58,7 +58,6 @@
                                     <td width="150px">
                                         <a href="<?php echo base_url() ?>backend/package/packagestats/confirm_package?id=<?php echo $value->pending_package_id; ?>&user_id=<?php echo $value->user_id; ?>&set_status=2" class="btn btn-success btn-sm"><?php echo display('confirm') ?></a>
                                         <a href="<?php echo base_url() ?>backend/package/packagestats/cancel_package?id=<?php echo $value->pending_package_id; ?>&user_id=<?php echo $value->user_id; ?>&set_status=0" class="btn btn-danger btn-sm"><?php echo display('cancel') ?></a>
-
                                     </td>
                                 <?php } ?>
                             </tr>
