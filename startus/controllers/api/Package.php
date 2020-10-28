@@ -113,7 +113,7 @@ class Package extends REST_Controller
             // $this->session->set_flashdata('message', display("image_upload_successfully"));
         }
 
-        $sdata = array(
+        $sdata = (object)$userdata = array(
             'coin_id'                  => $this->input->post('cid', TRUE),
             'user_id'                  => $user_id,
             'wallet_id'          => $this->input->post('wallet_id', TRUE),
