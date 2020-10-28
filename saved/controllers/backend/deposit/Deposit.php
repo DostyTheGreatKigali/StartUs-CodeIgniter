@@ -141,7 +141,7 @@ class Deposit extends CI_Controller
                 'transection_category'      => 'deposit',
                 'releted_id'                => $data->deposit_id,
                 'amount'                    => $data->deposit_amount,
-                'comments'                  => "Deposite by OM Mobile",
+                'comments'                  => "Deposited by OM Mobile",
                 'transection_date_timestamp' => date('Y-m-d h:i:s')
             );
             $this->diposit_model->save_transections($transections_data);

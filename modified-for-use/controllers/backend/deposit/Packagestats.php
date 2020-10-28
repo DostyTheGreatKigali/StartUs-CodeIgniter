@@ -10,7 +10,7 @@ class Packagestats extends CI_Controller
         $this->load->model(array(
 
             'backend/package/packagestats_model',
-            'customer/package_model',
+            'customer/packageconfirmed_model',
             'customer/transections_model',
             'common_model',
         ));
@@ -25,51 +25,51 @@ class Packagestats extends CI_Controller
             redirect('admin');
     }
 
-    // public function package_list()
-    // {
-    //     $data['title'] = "Packages List";
-    //     #-------------------------------#
-    //     #
-    //     #pagination starts
-    //     #
-    //     $config["base_url"] = base_url( 'backend/package/packagestats/deposit_list');
-    //     $config["total_rows"] = $this->db->get_where('deposit', array('status' => 1, 'deposit_method' => 'phone'))->num_rows();
-    //     $config["per_page"] = 25;
-    //     $config["uri_segment"] = 5;
-    //     $config["last_link"] = "Last";
-    //     $config["first_link"] = "First";
-    //     $config['next_link'] = 'Next';
-    //     $config['prev_link'] = 'Prev';
-    //     $config['full_tag_open'] = "<ul class='pagination col-xs pull-right'>";
-    //     $config['full_tag_close'] = "</ul>";
-    //     $config['num_tag_open'] = '<li>';
-    //     $config['num_tag_close'] = '</li>';
-    //     $config['cur_tag_open'] = "<li class='disabled'><li class='active'><a href='#'>";
-    //     $config['cur_tag_close'] = "<span class='sr-only'></span></a></li>";
-    //     $config['next_tag_open'] = "<li>";
-    //     $config['next_tag_close'] = "</li>";
-    //     $config['prev_tag_open'] = "<li>";
-    //     $config['prev_tagl_close'] = "</li>";
-    //     $config['first_tag_open'] = "<li>";
-    //     $config['first_tagl_close'] = "</li>";
-    //     $config['last_tag_open'] = "<li>";
-    //     $config['last_tagl_close'] = "</li>";
-    //     /* ends of bootstrap */
-    //     $this->pagination->initialize($config);
-    //     $page = ($this->uri->segment(5)) ? $this->uri->segment(5) : 0;
-    //     $data['deposit'] = $this->db->select('*')->from('deposit')
-    //         ->where('status', 1)
-    //         ->where('deposit_method', 'phone')
-    //         ->limit($config["per_page"], $page)
-    //         ->get()
-    //         ->result();
-    //     $data["links"] = $this->pagination->create_links();
-    //     #
-    //     #pagination ends
-    //     #    
-    //     $data['content'] = $this->load->view("backend/deposit/list", $data, true);
-    //     $this->load->view("backend/layout/main_wrapper", $data);
-    // }
+    public function package_list()
+    {
+        $data['title'] = "Packages List";
+        #-------------------------------#
+        #
+        #pagination starts
+        #
+        $config["base_url"] = base_url('backend/package/packagestats/package_list');
+        $config["total_rows"] = $this->db->get_where('pending_package_buying', array('status' => 2))->num_rows();
+        $config["per_page"] = 25;
+        $config["uri_segment"] = 5;
+        $config["last_link"] = "Last";
+        $config["first_link"] = "First";
+        $config['next_link'] = 'Next';
+        $config['prev_link'] = 'Prev';
+        $config['full_tag_open'] = "<ul class='pagination col-xs pull-right'>";
+        $config['full_tag_close'] = "</ul>";
+        $config['num_tag_open'] = '<li>';
+        $config['num_tag_close'] = '</li>';
+        $config['cur_tag_open'] = "<li class='disabled'><li class='active'><a href='#'>";
+        $config['cur_tag_close'] = "<span class='sr-only'></span></a></li>";
+        $config['next_tag_open'] = "<li>";
+        $config['next_tag_close'] = "</li>";
+        $config['prev_tag_open'] = "<li>";
+        $config['prev_tagl_close'] = "</li>";
+        $config['first_tag_open'] = "<li>";
+        $config['first_tagl_close'] = "</li>";
+        $config['last_tag_open'] = "<li>";
+        $config['last_tagl_close'] = "</li>";
+        /* ends of bootstrap */
+        $this->pagination->initialize($config);
+        $page = ($this->uri->segment(5)) ? $this->uri->segment(5) : 0;
+        $data['confirmedPackages'] = $this->db->select('*')->from('pending_package_buying')
+            ->where('status', 2)
+            // ->where('deposit_method', 'phone')
+            ->limit($config["per_page"], $page)
+            ->get()
+            ->result();
+        $data["links"] = $this->pagination->create_links();
+        #
+        #pagination ends
+        #    
+        $data['content'] = $this->load->view("backend/package/pendinglist", $data, true);
+        $this->load->view("backend/layout/main_wrapper", $data);
+    }
 
 
     public function pending_package()
@@ -129,22 +129,22 @@ class Packagestats extends CI_Controller
             'status' => $set_status,
         );
 
-        $this->db->where('deposit_id', $id)->where('user_id', $user_id)->update('deposit', $data);
+        $this->db->where('pending_package_id', $id)->where('user_id', $user_id)->update('pending_package_buying', $data);
 
-        $data = $this->db->select('*')->from('deposit')->where('deposit_id', $id)->get()->row();
+        $data = $this->db->select('*')->from('pending_package_buying')->where('pending_package_id', $id)->get()->row();
         $userdata = $this->db->select('*')->from('user_registration')->where('user_id', $user_id)->get()->row();
 
         if ($data != NULL) {
 
             $transections_data = array(
                 'user_id'                   => $data->user_id,
-                'transection_category'      => 'deposit',
-                'releted_id'                => $data->deposit_id,
-                'amount'                    => $data->deposit_amount,
-                'comments'                  => "Deposite by OM Mobile",
+                'transection_category'      => 'investment',
+                'releted_id'                => $data->pending_package_id,
+                'amount'                    => $data->buy_amount,
+                // 'comments'                  => "Deposite by OM Mobile",
                 'transection_date_timestamp' => date('Y-m-d h:i:s')
             );
-            $this->diposit_model->save_transections($transections_data);
+            $this->packageconfirmed_model->save_transections($transections_data);
         }
 
         $set = $this->common_model->email_sms('email');
@@ -173,7 +173,7 @@ class Packagestats extends CI_Controller
                     'notification_type'      => 'deposit',
                     'details'                => 'You successfully deposit The amount $' . $data->deposit_amount . '. Your new balance is $' . $balance['balance'],
                     'date'                   => date('Y-m-d h:i:s'),
-                    'status'                 => '0'
+                    'status'                 => '1'
                 );
                 $this->db->insert('notifications', $n);
             }
@@ -191,7 +191,7 @@ class Packagestats extends CI_Controller
             #------------------------------
             $send_sms = $this->sms_lib->send(array(
                 'to'              => $userdata->phone,
-                'header'         => 'Deposit',
+                'header'         => 'Package Buying',
                 'template'        => 'You successfully deposit the amount $%amount% . Your new balance is $%new_balance%.',
                 'template_config' => $template,
             ));
@@ -227,10 +227,10 @@ class Packagestats extends CI_Controller
         );
 
 
-        $this->db->where('deposit_id', $id)
+        $this->db->where('pending_package_id', $id)
             ->where('user_id', $user_id)
-            ->update('deposit', $data);
+            ->update('pending_package_buying', $data);
 
-        redirect('backend/deposit/deposit/pending_deposit');
+        redirect('backend/package/packagestats/pending_package');
     }
 }
