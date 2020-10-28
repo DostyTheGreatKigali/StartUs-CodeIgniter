@@ -1,3 +1,9 @@
+<style>
+    .se-pre-con {
+        display: none !important;
+    }
+</style>
+
 <div class="row">
     <div class="col-sm-12 col-md-12">
         <div class="panel panel-bd lobidrag">

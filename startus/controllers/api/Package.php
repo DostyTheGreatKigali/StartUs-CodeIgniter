@@ -113,46 +113,47 @@ class Package extends REST_Controller
             // $this->session->set_flashdata('message', display("image_upload_successfully"));
         }
 
+        $sdata = array(
+            'coin_id'                  => $this->input->post('cid', TRUE),
+            'user_id'                  => $user_id,
+            'wallet_id'          => $this->input->post('wallet_id', TRUE),
+            'buy_amount'              => $this->input->post('buy_amount', TRUE),
+            'package_id'              => $this->input->post('package_id', TRUE),
+            'status'                  => 1
+        );
 
         if ($this->form_validation->run()) {
-            // if (empty($buy_id)) {
-            //     if ($this->buy_model->create($userdata)) {
-            //         if (!empty($image)) {
-            //             $data['document']   = (object)$documentdata = array(
-            //                 'ext_exchange_id'      => $this->db->insert_id(),
-            //                 'doc_url'              => (!empty($image) ? $image : '')
-            //             );
-            //             $this->buy_model->documentcreate($documentdata);
-            //         }
+            if (empty($buy_id)) {
+                if ($this->buy_model->create($userdata)) {
+                    if (!empty($image)) {
+                        $data['document']   = (object)$documentdata = array(
+                            'ext_exchange_id'      => $this->db->insert_id(),
+                            'doc_url'              => (!empty($image) ? $image : '')
+                        );
+                        $this->buy_model->documentcreate($documentdata);
+                    }
 
-            //         // $this->session->set_flashdata('message', display('save_successfully'));
-            //         // return $this->response(['success' => TRUE, 'message' => display('save_successfully')], REST_Controller::HTTP_OK);
-            //     } else {
-            //         // if (data['ref_id'] != data['admin_ref_id']) {
-            //         //     return $this->response(['success' => FALSE, 'message' => "Invalid Reference ID"], REST_Controller::HTTP_OK);
-            //         // }
-            //         //     $uploadedFiles = [];
-            //         //     $uploadErrors = [];
+                    // $this->session->set_flashdata('message', display('save_successfully'));
+                    // return $this->response(['success' => TRUE, 'message' => display('save_successfully')], REST_Controller::HTTP_OK);
+                } else {
+                    // if (data['ref_id'] != data['admin_ref_id']) {
+                    //     return $this->response(['success' => FALSE, 'message' => "Invalid Reference ID"], REST_Controller::HTTP_OK);
+                    // }
+                    //     $uploadedFiles = [];
+                    //     $uploadErrors = [];
 
 
-            //         // if(!$this->upload->do_upload('document')) {
-            //         //         $uploadErrors[] = $this->upload->display_errors();
-            //         //     }
+                    // if(!$this->upload->do_upload('document')) {
+                    //         $uploadErrors[] = $this->upload->display_errors();
+                    //     }
 
-            //         return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
-            //         // return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
-            //         // $this->session->set_flashdata('exception', display('please_try_again'));
-            //     }
-            //     // redirect("customer/sell/form/");
-            // }
-            $sdata = array(
-                'coin_id'                  => $this->input->post('cid', TRUE),
-                'user_id'                  => $user_id,
-                'wallet_id'          => $this->input->post('wallet_id', TRUE),
-                'buy_amount'              => $this->input->post('buy_amount', TRUE),
-                'package_id'              => $this->input->post('package_id', TRUE),
-                'status'                  => 1
-            );
+                    return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
+                    // return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
+                    // $this->session->set_flashdata('exception', display('please_try_again'));
+                }
+                // redirect("customer/sell/form/");
+            }
+
 
             $this->db->insert('pending_package_buying', $sdata);
 
