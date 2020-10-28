@@ -21,6 +21,8 @@
                             <th><?php echo "Sponsor ID" ?></th>
                             <th><?php echo "Amount" ?></th>
                             <th><?php echo "Status" ?></th>
+                            <th><?php echo "Date" ?></th>
+                            <th><?php echo "Action/Status" ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,22 +44,6 @@
                                 <?php } else { ?>
                                     <td><?php echo "Declined" ?></td>
                                 <?php } ?>
-
-                                <!-- <td></td> -->
-
-                                <td>
-                                    <?php
-                                    // if (is_string($value->comments) && is_array(json_decode($value->comments, true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false) {
-                                    //     $mobiledata = json_decode($value->comments, true);
-                                    //     echo '<b>OM Name:</b> ' . $mobiledata['om_name'] . '<br>';
-                                    //     echo '<b>OM Phone No:</b> ' . $mobiledata['om_mobile'] . '<br>';
-                                    //     echo '<b>Transaction No:</b> ' . $mobiledata['transaction_no'] . '<br>';
-                                    //     echo '<b>ID Card No:</b> ' . $mobiledata['idcard_no'];
-                                    // } else {
-                                    //     echo $value->comments;
-                                    // }
-                                    ?>
-                                </td>
                                 <td>
                                     <?php
                                     $date = date_create($value->package_request_date);
