@@ -92,59 +92,8 @@ class Package extends REST_Controller
         $this->form_validation->set_rules('wallet_id', display('wallet_data'), 'required');
         $this->form_validation->set_rules('package_id', 'package_id', 'required');
 
-
-
-        //set config 
-        $config = [
-            'upload_path'       => 'upload/document/',
-            'allowed_types'     => 'gif|jpg|png|jpeg|pdf',
-            'overwrite'         => false,
-            'maintain_ratio'     => true,
-            'encrypt_name'      => true,
-            'remove_spaces'     => true,
-            'file_ext_tolower'     => true,
-            'max_size'     => 10240
-        ];
-        $this->load->library('upload', $config);
-        if ($this->upload->do_upload('document')) {
-            $data = $this->upload->data();
-            $image = $config['upload_path'] . $data['file_name'];
-
-            // $this->session->set_flashdata('message', display("image_upload_successfully"));
-        }
-
-
         if ($this->form_validation->run()) {
-            // if (empty($buy_id)) {
-            //     if ($this->buy_model->create($userdata)) {
-            //         if (!empty($image)) {
-            //             $data['document']   = (object)$documentdata = array(
-            //                 'ext_exchange_id'      => $this->db->insert_id(),
-            //                 'doc_url'              => (!empty($image) ? $image : '')
-            //             );
-            //             $this->buy_model->documentcreate($documentdata);
-            //         }
 
-            //         // $this->session->set_flashdata('message', display('save_successfully'));
-            //         // return $this->response(['success' => TRUE, 'message' => display('save_successfully')], REST_Controller::HTTP_OK);
-            //     } else {
-            //         // if (data['ref_id'] != data['admin_ref_id']) {
-            //         //     return $this->response(['success' => FALSE, 'message' => "Invalid Reference ID"], REST_Controller::HTTP_OK);
-            //         // }
-            //         //     $uploadedFiles = [];
-            //         //     $uploadErrors = [];
-
-
-            //         // if(!$this->upload->do_upload('document')) {
-            //         //         $uploadErrors[] = $this->upload->display_errors();
-            //         //     }
-
-            //         return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
-            //         // return $this->response(['success' => TRUE, 'message' => display('please_try_again')], REST_Controller::HTTP_OK);
-            //         // $this->session->set_flashdata('exception', display('please_try_again'));
-            //     }
-            //     // redirect("customer/sell/form/");
-            // }
             $sdata = array(
                 'coin_id'                  => $this->input->post('cid', TRUE),
                 'user_id'                  => $user_id,
