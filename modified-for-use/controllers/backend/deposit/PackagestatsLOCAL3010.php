@@ -174,7 +174,7 @@ class Packagestats extends CI_Controller
                         'transection_category'      => 'deposit',
                         'releted_id'                => $deposit->deposit_id,
                         'amount'                    => $package_data->buy_amount,
-                        'comments'                  => "Deposite by OM Mobile",
+                        'comments'                  => "Deposited by Crypto",
                         'transection_date_timestamp' => date('Y-m-d h:i:s')
                     );
                     $this->diposit_model->save_transections($transections_data);
@@ -215,8 +215,9 @@ class Packagestats extends CI_Controller
                         'status'            => $set_status,
                     );
 
+                    // var_dump($buy_data);die("before Buy package");
                     $result = $this->package_model->buy_package($buy_data);
-
+                    // var_dump($result); die("Buy package passed");
                     // check investment by customent
                     $customent_investment = $this->db->select('*')->from('investment')->where('user_id', $user_id)->get()->num_rows();
 
@@ -228,190 +229,188 @@ class Packagestats extends CI_Controller
                     $investment = $this->db->select('*')->from('investment')->where('user_id', $sponsor_id)->get()->num_rows();
 
 
-                    if ($sponsor_id != NULL) {
+                    // if($sponsor_id!=NULL){
 
-                        if ($investment > 0) {
-                            // get package informaion by package id
-                            // Package already obtained from $package_data
-                            // $pack_info = $this->package_model->package_info_by_id($package_id);
-                            #--------------------------------
-                            #    commission data save
-                            $commission_amount = ($package_data->buy_amount / 100) * 6;
+                    //     if($investment > 0 ){
+                    //         // get package informaion by package id
+                    //         $pack_info = $this->package_model->package_info_by_id($package_id);
+                    //         #--------------------------------
+                    //         #    commission data save
+                    //         $commission_amount = ($package_data->buy_amount/100)*6;
+                    //         $commission = array(
 
-                            $commission = array(
+                    //             'user_id'       => $sponsor_id,
+                    //             'Purchaser_id'  => $user_id,
+                    //             'earning_type'  => 'type1',
+                    //             'package_id'    => $package_id,
+                    //             'amount'        => $commission_amount,
+                    //             'date'          => date('Y-m-d'),
 
-                                'user_id'       => $sponsor_id,
-                                'Purchaser_id'  => $user_id,
-                                'earning_type'  => 'type1',
-                                'package_id'    => $package_id,
-                                'amount'        => $commission_amount,
-                                'date'          => date('Y-m-d'),
+                    //         );
 
-                            );
+                    //         $this->db->insert('earnings',$commission);
+                    //         #   end commission
+                    //         #---------------------------------
 
-                            $this->db->insert('earnings', $commission);
-                            #   end commission
-                            #---------------------------------
+                    //         //get total balance
+                    //         $balance = $this->common_model->get_all_transection_by_user($sponsers_info->user_id);   
+                    //         $new_balance = ($balance['balance']+$commission_amount);
+                    //         #----------------------------
+                    //         # sms send to commission received
+                    //         #----------------------------
 
-                            //get total balance
-                            $balance = $this->common_model->get_all_transection_by_user($sponsers_info->user_id);
-                            $new_balance = ($balance['balance'] + $commission_amount);
-                            #----------------------------
-                            # sms send to commission received
-                            #----------------------------
+                    //         $this->load->library('sms_lib');
+                    //         $template = array( 
+                    //             'name'      => $sponsers_info->f_name.' '.$sponsers_info->l_name,
+                    //             'amount'    => $commission_amount,
+                    //             'new_balance'=> $new_balance,
+                    //             'date'      => date('d F Y')
+                    //         );
 
-                            // $this->load->library('sms_lib');
-                            // $template = array( 
-                            //     'name'      => $sponsers_info->f_name.' '.$sponsers_info->l_name,
-                            //     'amount'    => $commission_amount,
-                            //     'new_balance'=> $new_balance,
-                            //     'date'      => date('d F Y')
-                            // );
+                    //         $send_sms = $this->sms_lib->send(array(
 
-                            // $send_sms = $this->sms_lib->send(array(
+                    //             'to'              => $sponsers_info->phone, 
+                    //             'template'        => 'You received a referral commission of $%amount% . Your new balance is $%new_balance%', 
+                    //             'template_config' => $template,
 
-                            //     'to'              => $sponsers_info->phone, 
-                            //     'template'        => 'You received a referral commission of $%amount% . Your new balance is $%new_balance%', 
-                            //     'template_config' => $template,
+                    //         ));
 
-                            // ));
+                    //         #----------------------------------
+                    //         #   sms insert to received commission
+                    //         #---------------------------------
+                    //         if($send_sms){
+                    //             $message_data = array(
+                    //                 'sender_id' =>1,
+                    //                 'receiver_id' => $sponsers_info->user_id,
+                    //                 'subject' => 'Commission',
+                    //                 'message' => 'You received a referral commission of $'.$commission_amount.'. Your new balance is $'.$new_balance,
+                    //                 'datetime' => date('Y-m-d h:i:s'),
+                    //             );
 
-                            // #----------------------------------
-                            // #   sms insert to received commission
-                            // #---------------------------------
-                            // if($send_sms){
-                            //     $message_data = array(
-                            //         'sender_id' =>1,
-                            //         'receiver_id' => $sponsers_info->user_id,
-                            //         'subject' => 'Commission',
-                            //         'message' => 'You received a referral commission of $'.$commission_amount.'. Your new balance is $'.$new_balance,
-                            //         'datetime' => date('Y-m-d h:i:s'),
-                            //     );
-
-                            //     $this->db->insert('message',$message_data);
-                            // }
-                            // #-------------------------------------     
+                    //             $this->db->insert('message',$message_data);
+                    //         }
+                    //         #-------------------------------------     
 
 
-                            #---------------------------------
-                            #   Won Sponser set personal and team commission set heare
+                    //         #---------------------------------
+                    //         #   Won Sponser set personal and team commission set heare
 
-                            $sponsers = $this->db->select('*')
-                                ->from('team_bonus')
-                                ->where('user_id', $sponsor_id)
-                                ->get()
-                                ->row();
+                    //         $sponsers = $this->db->select('*')
+                    //         ->from('team_bonus')
+                    //         ->where('user_id',$sponsor_id)
+                    //         ->get()
+                    //         ->row();
 
-                            if ($sponsers != NULL) {
+                    //         if($sponsers!=NULL){
 
-                                $scom = @$sponsers->sponser_commission + $package_data->buy_amount;
-                                $tcom = @$sponsers->team_commission + $package_data->buy_amount;
-                                $sdata = array(
-                                    'sponser_commission' => $scom,
-                                    'team_commission' => $tcom,
-                                    'last_update' => date('Y-m-d h:i:s')
-                                );
-                                $detailsdata = array(
-                                    'user_id' => $sponsor_id,
-                                    'sponser_commission' => $scom,
-                                    'team_commission' => $tcom,
-                                    'last_update' => date('Y-m-d h:i:s')
-                                );
+                    //             $scom = @$sponsers->sponser_commission + $package_data->buy_amount;
+                    //             $tcom = @$sponsers->team_commission + $package_data->buy_amount;
+                    //             $sdata = array(
+                    //                 'sponser_commission'=>$scom,
+                    //                 'team_commission'=>$tcom,
+                    //                 'last_update'=>date('Y-m-d h:i:s')
+                    //             );
+                    //             $detailsdata = array(
+                    //                 'user_id'=>$sponsor_id,
+                    //                 'sponser_commission'=>$scom,
+                    //                 'team_commission'=>$tcom,
+                    //                 'last_update'=>date('Y-m-d h:i:s')
+                    //             );
 
-
-
-
-                                /******************************
-                                 *   Data Store Details Table
-                                 ******************************/
-                                $this->db->insert('team_bonus_details', $detailsdata);
+                    //             /******************************
+                    //             *   Data Store Details Table
+                    //             ******************************/
+                    //             $this->db->insert('team_bonus_details',$detailsdata);
 
 
-                                $this->db->where('user_id', $sponsor_id)->update('team_bonus', $sdata);
-                            } else {
+                    //             $this->db->where('user_id',$sponsor_id)->update('team_bonus',$sdata);
 
-                                $scom = @$sponsers->sponser_commission + $package_data->buy_amount;
-                                $tcom = @$sponsers->team_commission + $package_data->buy_amount;
+                    //         } else {
 
-                                $sdata = array(
-                                    'user_id' => $sponsor_id,
-                                    'sponser_commission' => $scom,
-                                    'team_commission' => $tcom,
-                                    'last_update' => date('Y-m-d h:i:s')
-                                );
+                    //             $scom = @$sponsers->sponser_commission + $package_data->buy_amount;
+                    //             $tcom = @$sponsers->team_commission + $package_data->buy_amount;
 
-                                /******************************
-                                 *   Data Store Details Table
-                                 ******************************/
-                                $this->db->insert('team_bonus_details', $sdata);
-                                $this->db->insert('team_bonus', $sdata);
-                            }
+                    //             $sdata = array(
+                    //                 'user_id'=>$sponsor_id,
+                    //                 'sponser_commission'=>$scom,
+                    //                 'team_commission'=>$tcom,
+                    //                 'last_update'=>date('Y-m-d h:i:s')
+                    //             );
 
-                            # END 
-                            #---------------------------------
+                    //             /******************************
+                    //             *   Data Store Details Table
+                    //             ******************************/
+                    //             $this->db->insert('team_bonus_details',$sdata);
+                    //             $this->db->insert('team_bonus',$sdata);
 
-                            #-----------------------------
-                            # Level bonus heare with level
-                            $getBool = $this->setlevel_withbonus($sponsor_id);
-                            #-----------------------------
+                    //         }
 
-                            #-----------------------------------
-                            # Leveling heare without level bonus
-                            // if($getBool!=TRUE){
-                            //     $this->setUserLevel($sponsor_id);
-                            // }
-                            #
-                            #-----------------------------------
+                    //         # END 
+                    //         #---------------------------------
 
-                            #---------------------------------
-                            #    sponser leveling check and set commission
-                            $lc = $this->db->select('user_id,level')
-                                ->from('team_bonus')
-                                ->where('user_id', $sponsor_id)
-                                ->where('level >=', 2)
-                                ->get()
-                                ->row();
+                    //         #-----------------------------
+                    //         # Level bonus heare with level
+                    //         $getBool = $this->setlevel_withbonus($sponsor_id);
+                    //         #-----------------------------
 
-                            if (@$lc != NULL) {
+                    //         #-----------------------------------
+                    //         # Leveling heare without level bonus
+                    //         // if($getBool!=TRUE){
+                    //         //     $this->setUserLevel($sponsor_id);
+                    //         // }
+                    //         #
+                    //         #-----------------------------------
 
-                                $referral_bonous = $this->db->select('*')
-                                    ->from('setup_commission')
-                                    ->where('level_name', 1)
-                                    ->get()
-                                    ->row();
+                    //         #---------------------------------
+                    //        #    sponser leveling check and set commission
+                    //         $lc = $this->db->select('user_id,level')
+                    //         ->from('team_bonus')
+                    //         ->where('user_id',$sponsor_id)
+                    //         ->where('level >=',2)
+                    //         ->get()
+                    //         ->row();
 
-                                $commission_amount = ($package_data->buy_amount / 100) * $referral_bonous->referral_bonous;
+                    //         if(@$lc!=NULL){
 
-                                $commission = array(
-                                    'user_id'       => $sponsor_id,
-                                    'Purchaser_id'  => $user_id,
-                                    'earning_type'  => 'type1',
-                                    'package_id'    => $package_id,
-                                    'amount'        => $commission_amount,
-                                    'date'          => date('Y-m-d'),
-                                );
+                    //             $referral_bonous = $this->db->select('*')
+                    //             ->from('setup_commission')
+                    //             ->where('level_name',1)
+                    //             ->get()
+                    //             ->row();
 
-                                $this->db->insert('earnings', $commission);
-                            }
-                        }
-                        #
-                        #-----------------------------------
+                    //             $commission_amount = ($package_data->buy_amount/100)*$referral_bonous->referral_bonous;
 
-                        #--------------------------------
-                        #
-                        $tuSdata = array(
+                    //             $commission = array(
+                    //                 'user_id'       => $sponsor_id,
+                    //                 'Purchaser_id'  => $user_id,
+                    //                 'earning_type'  => 'type1',
+                    //                 'package_id'    => $package_id,
+                    //                 'amount'        => $commission_amount,
+                    //                 'date'          => date('Y-m-d'),
+                    //             );
 
-                            'genaretion'    => 2,
-                            'package_id'    => $package_id,
-                            'amount'        => $package_data->buy_amount,
-                            'sponsor_id'    => $sponsor_id
-                        );
+                    //             $this->db->insert('earnings',$commission);
+                    //         }
 
-                        $this->recursive_data($tuSdata, $package_data, $user_id);
-                        #
-                        #--------------------------------
+                    //     }
+                    //     #
+                    //     #-----------------------------------
 
-                    }
+                    //     #--------------------------------
+                    //     #
+                    //     $tuSdata = array(
+
+                    //         'genaretion'    =>2,
+                    //         'package_id'    =>$package_id,
+                    //         'amount'        =>$package_data->buy_amount,
+                    //         'sponsor_id'    =>$sponsor_id
+                    //     );
+
+                    //     $this->recursive_data($tuSdata);
+                    //     #
+                    //     #--------------------------------
+
+                    // }
 
                     if ($result != NULL) {
                         $transections_data = array(
@@ -421,8 +420,8 @@ class Packagestats extends CI_Controller
                             'amount'                    => $package_data->buy_amount,
                             'transection_date_timestamp' => date('Y-m-d h:i:s')
                         );
-                        // var_dump($transections_datatransections_data);
-
+                        // var_dump($transections_data);
+                        //  die("Here at");
                         $this->transections_model->save_transections($transections_data);
                         #----------------------------
                         # sms send to commission received
@@ -877,135 +876,6 @@ class Packagestats extends CI_Controller
             } else {
                 return FALSE;
             }
-        }
-    }
-
-
-    /**
-     * recursive function
-     *
-     * @param   array  $sp
-     * @return   1 and finish recursive function
-     * specific package needed because amount is now not tied to the
-     * package itself but rather what the input based on range provided 
-     * by the package
-     */
-
-    public function recursive_data($sp = NULL, $package_data, $user_id)
-    {
-
-        $data = $this->db->select('user_id,sponsor_id')
-            ->from('user_registration')
-            ->where('user_id', @$sp['sponsor_id'])
-            ->get()->row();
-
-
-        if (@$data->sponsor_id != NULL && @$sp['genaretion'] <= 5) {
-
-            $investment = $this->db->select('*')->from('investment')->where('user_id', $data->sponsor_id)->get()->num_rows();
-
-
-            if ($investment != NUll) {
-
-                $sponsers = $this->db->select('*')
-                    ->from('team_bonus')
-                    ->where('user_id', $data->sponsor_id)
-                    ->get()
-                    ->row();
-
-                if ($sponsers != NULL) {
-                    $scom = @$sponsers->sponser_commission + @$sp['amount'];
-                    $tcom = @$sponsers->team_commission + @$sp['amount'];
-
-
-                    $detailsdata = array('user_id' => @$data->sponsor_id, 'team_commission' => $tcom, 'sponser_commission' => $scom, 'last_update' => date('Y-m-d h:i:s'));
-                    /*
-                    |
-                    |   Data Store Details Table
-                    |
-                    */
-                    $this->db->insert('team_bonus_details', $detailsdata);
-
-                    $sdata = array('team_commission' => $tcom, 'last_update' => date('Y-m-d h:i:s'));
-                    $this->db->where('user_id', @$data->sponsor_id)->update('team_bonus', $sdata);
-                } else {
-
-                    //$scom = @$sponsers->sponser_commission + $sp['amount'];
-                    $tcom = @$sponsers->team_commission + @$sp['amount'];
-                    $sdata = array('user_id' => @$data->sponsor_id, 'team_commission' => $tcom, 'last_update' => date('Y-m-d h:i:s'));
-
-                    /*
-                    |
-                    |   Data Store Details Table
-                    |
-                    */
-                    $this->db->insert('team_bonus_details', $team_bonus_details);
-
-
-                    $this->db->insert('team_bonus', $sdata);
-                }
-
-                //$this->level_complit($data->sponsor_id);
-
-                #-----------------------------
-                # Level bonus heare with level
-                $getBool = $this->setlevel_withbonus($data->sponsor_id);
-                #-----------------------------
-
-                #-----------------------------------
-                # Leveling heare without level bonus
-                // if($getBool!=TRUE){
-                //     $this->setUserLevel($data->sponsor_id);
-                // }
-                #
-                #-----------------------------------
-
-                #---------------------------------
-                #    sponser leveling check and set commission
-                $lc = $this->db->select('user_id,level')
-                    ->from('team_bonus')
-                    ->where('user_id', $data->sponsor_id)
-                    ->where('level >=', 2)
-                    ->get()
-                    ->row();
-
-                if (@$lc != NULL) {
-
-                    $referral_bonous = $this->db->select('*')
-                        ->from('setup_commission')
-                        ->where('level_name', $lc->level)
-                        ->get()
-                        ->row();
-
-                    // $pack_info = $this->package_model->package_info_by_id(@$sp['package_id']);
-
-                    // $commission_amount = ($pack_info->package_amount/100)*$referral_bonous->referral_bonous;
-                    $commission_amount = ($package_data->buy_amount / 100) * $referral_bonous->referral_bonous;
-
-                    $commission = array(
-                        'user_id'       => $data->sponsor_id,
-                        'Purchaser_id'  => $user_id,
-                        'earning_type'  => 'type1',
-                        'package_id'    => @$sp['package_id'],
-                        'amount'        => $commission_amount,
-                        'date'          => date('Y-m-d'),
-                    );
-
-                    $this->db->insert('earnings', $commission);
-                }
-            }
-
-            $tuSdata = array(
-                'genaretion' => @$sp['genaretion'] + 1,
-                'amount' => @$sp['amount'],
-                'package_id' => @$sp['package_id'],
-                'sponsor_id' => @$data->sponsor_id,
-            );
-
-            $this->recursive_data($tuSdata, $package_data, $user_id);
-        } else {
-
-            return 1;
         }
     }
 }
