@@ -1,3 +1,8 @@
+<style>
+    .se-pre-con {
+        display: none !important;
+    }
+</style>
 <div class="row">
     <div class="col-sm-12 col-md-12">
         <div class="panel panel-bd lobidrag">
@@ -12,8 +17,9 @@
                         <tr>
                             <th><?php echo display('sl_no') ?></th>
                             <th><?php echo display('package_name') ?></th>
+                            <th><?php echo 'Minimum Amount' ?></th>
+                            <th><?php echo 'Maximum Amount' ?></th>
                             <th><?php echo 'Interest Rate' ?></th>
-                            <th><?php echo display('daily_roi') ?></th>
                             <th><?php echo display('weekly_roi') ?></th>
                             <th><?php echo display('monthly_roi') ?></th>
                             <th><?php echo display('yearly_roi') ?></th>
@@ -29,9 +35,9 @@
                             <tr>
                                 <td><?php echo $sl++; ?></td>
                                 <td><?php echo $value->package_name; ?></td>
+                                <td><?php echo $value->min_amount; ?></td>
+                                <td><?php echo $value->max_amount; ?></td>
                                 <td><?php echo $value->earns_rate . "%"; ?></td>
-                                <td><?php echo $value->package_amount; ?></td>
-                                <td><?php echo $value->daily_roi; ?></td>
                                 <td><?php echo $value->weekly_roi; ?></td>
                                 <td><?php echo $value->monthly_roi; ?></td>
                                 <td><?php echo $value->yearly_roi; ?></td>
