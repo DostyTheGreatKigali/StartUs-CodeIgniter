@@ -91,7 +91,6 @@ class Package extends REST_Controller
         $this->form_validation->set_rules('buy_amount', display('buy_amount'), 'required');
         $this->form_validation->set_rules('wallet_id', display('wallet_data'), 'required');
         $this->form_validation->set_rules('package_id', 'package_id', 'required');
-        $this->form_validation->set_rules('hash_id', 'hash_id', 'required');
 
         if ($this->form_validation->run()) {
 
@@ -101,7 +100,6 @@ class Package extends REST_Controller
                 'wallet_id'          => $this->input->post('wallet_id', TRUE),
                 'buy_amount'              => $this->input->post('buy_amount', TRUE),
                 'package_id'              => $this->input->post('package_id', TRUE),
-                'hash_id'              => $this->input->post('hash_id', TRUE),
                 'status'                  => 1
             );
 
