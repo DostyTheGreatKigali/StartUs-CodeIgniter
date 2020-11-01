@@ -305,15 +305,17 @@ class Signup extends REST_Controller
                 if ($this->app_model->registerUser($data)) {
 
                     $from_email = "test@startusgh.com";
-                    $to_email = "abumucal@gmail.com";
-
+                    $to_email = $this->input->post('email');
+                    // $to_email = "abumucal@gmail.com";
+                    $msg = "<br><b>Your account was created successfully, Please click on the link below to activate your account. </b><br> <a target='_blank' href='" . base_url('home/activeAcc/') . strtolower($userid) . md5($userid) . "'>" . base_url('home/activeAcc/') . strtolower($userid) . md5($userid) . "</a>";
                     //Load email library 
                     $this->load->library('email');
 
                     $this->email->from($from_email, 'StarUs Tech');
                     $this->email->to($to_email);
                     $this->email->subject('Email Test');
-                    $this->email->message('Testing the email class.');
+                    $this->email->message($msg);
+                    // $this->email->message('Testing the email class.');
                     $this->email->send();
                     // print_r($_POST);
                     // die();
